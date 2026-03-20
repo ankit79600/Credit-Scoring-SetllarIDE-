@@ -56,7 +56,9 @@ The goal is to create a trust-based financial identity system where creditworthi
 ## 🖼️ Frontend Preview
 
 ### 🔹 UI Screenshot
-![Uploading Screenshot 2026-03-20 145752.png…]()
+
+
+<img width="1904" height="848" alt="Screenshot 2026-03-20 145752" src="https://github.com/user-attachments/assets/0b301c5c-4a0d-4c05-a7c6-812a01654740" />
 
 
 ---
