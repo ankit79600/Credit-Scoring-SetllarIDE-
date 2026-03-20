@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Stellar Dapp",
+  title: "Credit Score on Stellar",
   description:
-    "Fullstack Dapp built on Stellar",
+    "Submit, track, and verify credit scores immutably on Stellar with Soroban smart contracts.",
 };
 
 export default function RootLayout({
