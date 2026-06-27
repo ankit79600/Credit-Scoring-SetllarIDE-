@@ -42,7 +42,7 @@ function PowerIcon() {
 
 interface NavbarProps {
   walletAddress: string | null;
-  onConnect: () => void;
+  onConnect: () => Promise<void>;
   onDisconnect: () => void;
   isConnecting: boolean;
 }
@@ -56,6 +56,7 @@ export default function Navbar({
   const [copied, setCopied] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [connectError, setConnectError] = useState<string | null>(null);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
@@ -173,27 +174,39 @@ export default function Navbar({
               )}
             </div>
           ) : (
-            <button
-              onClick={onConnect}
-              disabled={isConnecting}
-              className="relative overflow-hidden rounded-xl bg-gradient-to-r from-[#7c6cf0] to-[#5b8cf0] p-[1px] transition-all hover:shadow-[0_0_25px_rgba(124,108,240,0.25)] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <div className="flex items-center gap-2 rounded-[11px] bg-[#0c0c1d]/90 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm">
-                {isConnecting ? (
-                  <>
-                    <svg className="animate-spin" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                      <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-                    </svg>
-                    Connecting...
-                  </>
-                ) : (
-                  <>
-                    <WalletIcon size={14} />
-                    Connect
-                  </>
-                )}
-              </div>
-            </button>
+            <div className="flex flex-col items-end gap-1">
+              <button
+                onClick={async () => {
+                  setConnectError(null);
+                  try {
+                    await onConnect();
+                  } catch (err: unknown) {
+                    setConnectError(err instanceof Error ? err.message : "Failed to connect wallet");
+                  }
+                }}
+                disabled={isConnecting}
+                className="relative overflow-hidden rounded-xl bg-gradient-to-r from-[#7c6cf0] to-[#5b8cf0] p-[1px] transition-all hover:shadow-[0_0_25px_rgba(124,108,240,0.25)] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <div className="flex items-center gap-2 rounded-[11px] bg-[#0c0c1d]/90 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm">
+                  {isConnecting ? (
+                    <>
+                      <svg className="animate-spin" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+                      </svg>
+                      Connecting...
+                    </>
+                  ) : (
+                    <>
+                      <WalletIcon size={14} />
+                      Connect
+                    </>
+                  )}
+                </div>
+              </button>
+              {connectError && (
+                <p className="text-[10px] text-[#f87171]/80 max-w-[200px] text-right">{connectError}</p>
+              )}
+            </div>
           )}
         </div>
       </div>

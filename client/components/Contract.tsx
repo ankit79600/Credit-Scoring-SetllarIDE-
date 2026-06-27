@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import {
   submitScore,
   getScores,
@@ -37,17 +37,6 @@ function UserIcon() {
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
       <circle cx="12" cy="7" r="4" />
-    </svg>
-  );
-}
-
-function RefreshIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
-      <path d="M21 3v5h-5" />
-      <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
-      <path d="M8 16H3v5" />
     </svg>
   );
 }
@@ -89,17 +78,46 @@ function ChartIcon() {
   );
 }
 
+function CopyIcon({ copied }: { copied?: boolean }) {
+  return copied ? (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
+  ) : (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+    </svg>
+  );
+}
+
+function ShareIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="18" cy="5" r="3" />
+      <circle cx="6" cy="12" r="3" />
+      <circle cx="18" cy="19" r="3" />
+      <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+      <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+    </svg>
+  );
+}
+
 // ── Styled Input ─────────────────────────────────────────────
 
 function Input({
   label,
+  hint,
   ...props
-}: { label: string } & React.InputHTMLAttributes<HTMLInputElement>) {
+}: { label: string; hint?: React.ReactNode } & React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <div className="space-y-2">
-      <label className="block text-[11px] font-medium uppercase tracking-wider text-white/30">
-        {label}
-      </label>
+      <div className="flex items-center justify-between">
+        <label className="block text-[11px] font-medium uppercase tracking-wider text-white/30">
+          {label}
+        </label>
+        {hint}
+      </div>
       <div className="group rounded-xl border border-white/[0.06] bg-white/[0.02] p-px transition-all focus-within:border-[#7c6cf0]/30 focus-within:shadow-[0_0_20px_rgba(124,108,240,0.08)]">
         <input
           {...props}
@@ -135,7 +153,7 @@ function MethodSignature({
   );
 }
 
-// ── Score Badge ──────────────────────────────────────────────
+// ── Score Config ─────────────────────────────────────────────
 
 function getScoreConfig(score: number): { color: string; bg: string; label: string } {
   if (score >= 800) return { color: "text-[#34d399]", bg: "bg-[#34d399]", label: "Excellent" };
@@ -145,9 +163,67 @@ function getScoreConfig(score: number): { color: string; bg: string; label: stri
   return { color: "text-[#f87171]", bg: "bg-[#f87171]", label: "Very Poor" };
 }
 
+// ── Utilities ────────────────────────────────────────────────
+
+function formatTimestamp(ts: number | undefined): string {
+  if (!ts) return "—";
+  return new Date(ts * 1000).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+// ── Score Bar Chart ──────────────────────────────────────────
+
+function ScoreBarChart({ scores }: { scores: Array<{ score: number }> }) {
+  if (scores.length === 0) return null;
+  const avg = Math.round(scores.reduce((s, e) => s + e.score, 0) / scores.length);
+
+  return (
+    <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-[10px] font-medium uppercase tracking-wider text-white/25">Distribution</span>
+        <span className="text-[10px] text-white/25 font-mono">avg {avg}</span>
+      </div>
+      <div className="flex items-end gap-1.5 h-14">
+        {scores.map((entry, i) => {
+          const cfg = getScoreConfig(entry.score);
+          const heightPct = Math.max(8, (entry.score / 1000) * 100);
+          return (
+            <div key={i} className="relative flex-1 flex flex-col items-center gap-1 group">
+              <div
+                className={cn("w-full rounded-sm transition-opacity opacity-50 group-hover:opacity-100", cfg.bg)}
+                style={{ height: `${heightPct}%` }}
+              />
+              <span className="text-[8px] font-mono text-white/20 leading-none">{entry.score}</span>
+              <div className="absolute bottom-full mb-1.5 hidden group-hover:flex bg-[#1a1a2e]/95 border border-white/[0.08] rounded-lg px-2 py-1.5 text-[9px] text-white/70 whitespace-nowrap z-10 flex-col items-center gap-0.5 shadow-xl">
+                <span className={cn("font-mono font-bold", cfg.color)}>{entry.score}</span>
+                <span className="text-white/40">{cfg.label}</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      {/* Average marker */}
+      <div className="mt-2 flex items-center gap-2">
+        <div className="h-px flex-1 bg-white/[0.04]" />
+        <span className="text-[9px] text-white/20 font-mono">avg {avg}</span>
+        <div className="h-px flex-1 bg-white/[0.04]" />
+      </div>
+    </div>
+  );
+}
+
 // ── Main Component ───────────────────────────────────────────
 
 type Tab = "lookup" | "submit" | "history";
+
+interface ScoreEntry {
+  evaluator: string;
+  score: number;
+  timestamp?: number;
+}
 
 interface ContractUIProps {
   walletAddress: string | null;
@@ -159,6 +235,8 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
   const [activeTab, setActiveTab] = useState<Tab>("lookup");
   const [error, setError] = useState<string | null>(null);
   const [txStatus, setTxStatus] = useState<string | null>(null);
+  const [copiedAddr, setCopiedAddr] = useState<string | null>(null);
+  const [shareToast, setShareToast] = useState(false);
 
   // Submit form state
   const [submitUser, setSubmitUser] = useState("");
@@ -171,17 +249,84 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
   const [lookupData, setLookupData] = useState<{
     evaluatorCount: number;
     averageScore: number;
-    scores: Array<{ evaluator: string; score: number }>;
+    scores: ScoreEntry[];
   } | null>(null);
 
   // History state
   const [historyUser, setHistoryUser] = useState("");
   const [isGettingHistory, setIsGettingHistory] = useState(false);
-  const [historyData, setHistoryData] = useState<Array<{ evaluator: string; score: number }> | null>(null);
+  const [historyData, setHistoryData] = useState<ScoreEntry[] | null>(null);
 
   const truncate = (addr: string) => `${addr.slice(0, 6)}...${addr.slice(-4)}`;
 
-  // Handle submit score
+  // ── Copy to clipboard ──────────────────────────────────────
+
+  const copyToClipboard = useCallback(async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      const el = document.createElement("textarea");
+      el.value = text;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand("copy");
+      document.body.removeChild(el);
+    }
+    setCopiedAddr(text);
+    setTimeout(() => setCopiedAddr(null), 2000);
+  }, []);
+
+  // ── Lookup logic (extracted so URL init can call it) ───────
+
+  const performLookup = useCallback(async (address: string) => {
+    setError(null);
+    setIsLookingUp(true);
+    setLookupData(null);
+    try {
+      const [countResult, avgResult, scoresResult] = await Promise.all([
+        getEvaluatorCount(address, walletAddress || undefined),
+        getAverageScore(address, walletAddress || undefined),
+        getScores(address, walletAddress || undefined),
+      ]);
+      setLookupData({
+        evaluatorCount: countResult ?? 0,
+        averageScore: avgResult ?? 0,
+        scores: (scoresResult ?? []) as ScoreEntry[],
+      });
+      // Sync URL so this lookup is shareable
+      const url = new URL(window.location.href);
+      url.searchParams.set("user", address);
+      window.history.replaceState({}, "", url.toString());
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Query failed");
+    } finally {
+      setIsLookingUp(false);
+    }
+  }, [walletAddress]);
+
+  // ── Read ?user= from URL on first mount ───────────────────
+
+  const didInitRef = useRef(false);
+  useEffect(() => {
+    if (didInitRef.current) return;
+    didInitRef.current = true;
+    const params = new URLSearchParams(window.location.search);
+    const user = params.get("user");
+    if (user && user.startsWith("G")) {
+      setLookupUser(user);
+      setActiveTab("lookup");
+      performLookup(user);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleLookup = useCallback(async () => {
+    if (!lookupUser.trim()) return setError("Enter a user address");
+    await performLookup(lookupUser.trim());
+  }, [lookupUser, performLookup]);
+
+  // ── Submit ────────────────────────────────────────────────
+
   const handleSubmitScore = useCallback(async () => {
     if (!walletAddress) return setError("Connect wallet first");
     if (!submitUser.trim() || !submitScoreValue.trim()) return setError("Fill in all fields");
@@ -206,31 +351,8 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
     }
   }, [walletAddress, submitUser, submitScoreValue]);
 
-  // Handle lookup
-  const handleLookup = useCallback(async () => {
-    if (!lookupUser.trim()) return setError("Enter a user address");
-    setError(null);
-    setIsLookingUp(true);
-    setLookupData(null);
-    try {
-      const [countResult, avgResult, scoresResult] = await Promise.all([
-        getEvaluatorCount(lookupUser.trim(), walletAddress || undefined),
-        getAverageScore(lookupUser.trim(), walletAddress || undefined),
-        getScores(lookupUser.trim(), walletAddress || undefined),
-      ]);
-      setLookupData({
-        evaluatorCount: countResult ?? 0,
-        averageScore: avgResult ?? 0,
-        scores: (scoresResult ?? []) as Array<{ evaluator: string; score: number }>,
-      });
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Query failed");
-    } finally {
-      setIsLookingUp(false);
-    }
-  }, [lookupUser, walletAddress]);
+  // ── History ───────────────────────────────────────────────
 
-  // Handle history
   const handleGetHistory = useCallback(async () => {
     if (!historyUser.trim()) return setError("Enter a user address");
     setError(null);
@@ -238,7 +360,7 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
     setHistoryData(null);
     try {
       const result = await getScores(historyUser.trim(), walletAddress || undefined);
-      setHistoryData((result ?? []) as Array<{ evaluator: string; score: number }>);
+      setHistoryData((result ?? []) as ScoreEntry[]);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Query failed");
     } finally {
@@ -246,11 +368,23 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
     }
   }, [historyUser, walletAddress]);
 
+  // ── Share current lookup ──────────────────────────────────
+
+  const handleShare = useCallback(async () => {
+    const url = new URL(window.location.href);
+    if (lookupUser.trim()) url.searchParams.set("user", lookupUser.trim());
+    await copyToClipboard(url.toString());
+    setShareToast(true);
+    setTimeout(() => setShareToast(false), 2000);
+  }, [lookupUser, copyToClipboard]);
+
   const tabs: { key: Tab; label: string; icon: React.ReactNode; color: string }[] = [
     { key: "lookup", label: "Lookup", icon: <SearchIcon />, color: "#4fc3f7" },
     { key: "submit", label: "Submit", icon: <StarIcon />, color: "#7c6cf0" },
     { key: "history", label: "History", icon: <ChartIcon />, color: "#fbbf24" },
   ];
+
+  const meetsThreshold = lookupData ? lookupData.evaluatorCount >= 3 : false;
 
   return (
     <div className="w-full max-w-2xl animate-fade-in-up-delayed">
@@ -275,6 +409,13 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
         </div>
       )}
 
+      {shareToast && (
+        <div className="mb-4 flex items-center gap-3 rounded-xl border border-[#4fc3f7]/15 bg-[#4fc3f7]/[0.05] px-4 py-3 backdrop-blur-sm animate-slide-down">
+          <span className="text-[#4fc3f7]"><CheckIcon /></span>
+          <span className="text-sm text-[#4fc3f7]/90">Link copied to clipboard</span>
+        </div>
+      )}
+
       {/* Main Card */}
       <Spotlight className="rounded-2xl">
         <AnimatedCard className="p-0" containerClassName="rounded-2xl">
@@ -288,7 +429,16 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
               </div>
               <div>
                 <h3 className="text-sm font-semibold text-white/90">Credit Score</h3>
-                <p className="text-[10px] text-white/25 font-mono mt-0.5">{truncate(CONTRACT_ADDRESS)}</p>
+                <button
+                  onClick={() => copyToClipboard(CONTRACT_ADDRESS)}
+                  className="flex items-center gap-1.5 text-[10px] text-white/25 font-mono mt-0.5 hover:text-white/50 transition-colors group"
+                  title="Copy contract address"
+                >
+                  {truncate(CONTRACT_ADDRESS)}
+                  <span className="opacity-0 group-hover:opacity-100 transition-opacity">
+                    <CopyIcon copied={copiedAddr === CONTRACT_ADDRESS} />
+                  </span>
+                </button>
               </div>
             </div>
             <Badge variant="info" className="text-[10px]">Soroban</Badge>
@@ -319,17 +469,56 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
 
           {/* Tab Content */}
           <div className="p-6">
-            {/* Lookup */}
+            {/* ── Lookup ── */}
             {activeTab === "lookup" && (
               <div className="space-y-5">
                 <MethodSignature name="get_evaluator_count / get_average_score" params="(user: Address)" returns="-> u32" color="#4fc3f7" />
-                <Input label="User Address" value={lookupUser} onChange={(e) => setLookupUser(e.target.value)} placeholder="G..." />
-                <ShimmerButton onClick={handleLookup} disabled={isLookingUp} shimmerColor="#4fc3f7" className="w-full">
-                  {isLookingUp ? <><SpinnerIcon /> Looking up...</> : <><SearchIcon /> Look Up Score</>}
-                </ShimmerButton>
+
+                <Input
+                  label="User Address"
+                  value={lookupUser}
+                  onChange={(e) => setLookupUser(e.target.value)}
+                  placeholder="G..."
+                  hint={
+                    walletAddress ? (
+                      <button
+                        onClick={() => setLookupUser(walletAddress)}
+                        className="flex items-center gap-1 text-[10px] text-[#4fc3f7]/50 hover:text-[#4fc3f7] transition-colors"
+                      >
+                        <UserIcon /> My address
+                      </button>
+                    ) : undefined
+                  }
+                />
+
+                <div className="flex gap-2">
+                  <ShimmerButton onClick={handleLookup} disabled={isLookingUp} shimmerColor="#4fc3f7" className="flex-1">
+                    {isLookingUp ? <><SpinnerIcon /> Looking up...</> : <><SearchIcon /> Look Up Score</>}
+                  </ShimmerButton>
+                  {lookupData && (
+                    <button
+                      onClick={handleShare}
+                      className="flex items-center gap-1.5 rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-2 text-xs text-white/40 hover:text-white/70 hover:border-white/[0.10] transition-all"
+                      title="Copy shareable link"
+                    >
+                      <ShareIcon /> Share
+                    </button>
+                  )}
+                </div>
 
                 {lookupData && (
                   <div className="space-y-4 animate-fade-in-up">
+                    {/* Threshold warning */}
+                    {lookupData.evaluatorCount > 0 && !meetsThreshold && (
+                      <div className="flex items-start gap-3 rounded-xl border border-[#fbbf24]/15 bg-[#fbbf24]/[0.03] px-4 py-3 text-xs text-white/40">
+                        <span className="text-[#fbbf24] mt-0.5"><AlertIcon /></span>
+                        <span>
+                          <span className="font-semibold text-[#fbbf24]/70">Low confidence:</span>{" "}
+                          Only {lookupData.evaluatorCount} evaluator{lookupData.evaluatorCount !== 1 ? "s" : ""} — at least 3 needed for a trusted score.
+                        </span>
+                      </div>
+                    )}
+
                     {/* Summary Cards */}
                     <div className="grid grid-cols-2 gap-3">
                       <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 text-center">
@@ -341,13 +530,22 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
                           const cfg = getScoreConfig(lookupData.averageScore);
                           return (
                             <>
-                              <div className={cn("text-2xl font-bold", cfg.color)}>{lookupData.averageScore}</div>
-                              <div className="text-[10px] text-white/25 mt-1 uppercase tracking-wider">{cfg.label}</div>
+                              <div className={cn("text-2xl font-bold", meetsThreshold ? cfg.color : "text-white/30")}>
+                                {lookupData.averageScore}
+                              </div>
+                              <div className="text-[10px] text-white/25 mt-1 uppercase tracking-wider">
+                                {meetsThreshold ? cfg.label : "Unverified"}
+                              </div>
                             </>
                           );
                         })()}
                       </div>
                     </div>
+
+                    {/* Bar chart */}
+                    {lookupData.scores.length > 0 && (
+                      <ScoreBarChart scores={lookupData.scores} />
+                    )}
 
                     {/* Score Entries */}
                     {lookupData.scores.length > 0 && (
@@ -361,7 +559,16 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
                             const cfg = getScoreConfig(entry.score);
                             return (
                               <div key={i} className="flex items-center justify-between rounded-lg px-3 py-2 border border-white/[0.04] bg-white/[0.01]">
-                                <span className="font-mono text-xs text-white/50">{truncate(entry.evaluator)}</span>
+                                <div className="flex items-center gap-2">
+                                  <span className="font-mono text-xs text-white/50">{truncate(entry.evaluator)}</span>
+                                  <button
+                                    onClick={() => copyToClipboard(entry.evaluator)}
+                                    className="text-white/20 hover:text-white/60 transition-colors"
+                                    title="Copy address"
+                                  >
+                                    <CopyIcon copied={copiedAddr === entry.evaluator} />
+                                  </button>
+                                </div>
                                 <div className="flex items-center gap-2">
                                   <div className={cn("h-1.5 w-1.5 rounded-full", cfg.bg)} />
                                   <span className={cn("font-mono text-sm font-semibold", cfg.color)}>{entry.score}</span>
@@ -383,15 +590,28 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
               </div>
             )}
 
-            {/* Submit */}
+            {/* ── Submit ── */}
             {activeTab === "submit" && (
               <div className="space-y-5">
                 <MethodSignature name="submit_score" params="(user: Address, score: u32, evaluator: Address)" color="#7c6cf0" />
                 <div className="rounded-xl border border-[#7c6cf0]/15 bg-[#7c6cf0]/[0.03] px-4 py-3 text-xs text-white/40">
                   <span className="font-semibold text-[#7c6cf0]/70">Note:</span> Scores must be 0–1000. You are the evaluator.
                 </div>
-                <Input label="User Address" value={submitUser} onChange={(e) => setSubmitUser(e.target.value)} placeholder="G... (the person being rated)" />
-                <Input label="Score (0-1000)" type="number" min="0" max="1000" value={submitScoreValue} onChange={(e) => setSubmitScoreValue(e.target.value)} placeholder="e.g. 750" />
+                <Input
+                  label="User Address"
+                  value={submitUser}
+                  onChange={(e) => setSubmitUser(e.target.value)}
+                  placeholder="G... (the person being rated)"
+                />
+                <Input
+                  label="Score (0-1000)"
+                  type="number"
+                  min="0"
+                  max="1000"
+                  value={submitScoreValue}
+                  onChange={(e) => setSubmitScoreValue(e.target.value)}
+                  placeholder="e.g. 750"
+                />
 
                 {walletAddress ? (
                   <ShimmerButton onClick={handleSubmitScore} disabled={isSubmitting} shimmerColor="#7c6cf0" className="w-full">
@@ -399,11 +619,18 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
                   </ShimmerButton>
                 ) : (
                   <button
-                    onClick={onConnect}
+                    onClick={async () => {
+                      setError(null);
+                      try {
+                        await onConnect();
+                      } catch (err: unknown) {
+                        setError(err instanceof Error ? err.message : "Failed to connect wallet");
+                      }
+                    }}
                     disabled={isConnecting}
                     className="w-full rounded-xl border border-dashed border-[#7c6cf0]/20 bg-[#7c6cf0]/[0.03] py-4 text-sm text-[#7c6cf0]/60 hover:border-[#7c6cf0]/30 hover:text-[#7c6cf0]/80 active:scale-[0.99] transition-all disabled:opacity-50"
                   >
-                    Connect wallet to submit scores
+                    {isConnecting ? "Connecting..." : "Connect wallet to submit scores"}
                   </button>
                 )}
 
@@ -426,11 +653,26 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
               </div>
             )}
 
-            {/* History */}
+            {/* ── History ── */}
             {activeTab === "history" && (
               <div className="space-y-5">
                 <MethodSignature name="get_scores" params="(user: Address)" returns="-> Vec<ScoreEntry>" color="#fbbf24" />
-                <Input label="User Address" value={historyUser} onChange={(e) => setHistoryUser(e.target.value)} placeholder="G..." />
+                <Input
+                  label="User Address"
+                  value={historyUser}
+                  onChange={(e) => setHistoryUser(e.target.value)}
+                  placeholder="G..."
+                  hint={
+                    walletAddress ? (
+                      <button
+                        onClick={() => setHistoryUser(walletAddress)}
+                        className="flex items-center gap-1 text-[10px] text-[#fbbf24]/50 hover:text-[#fbbf24] transition-colors"
+                      >
+                        <UserIcon /> My address
+                      </button>
+                    ) : undefined
+                  }
+                />
                 <ShimmerButton onClick={handleGetHistory} disabled={isGettingHistory} shimmerColor="#fbbf24" className="w-full">
                   {isGettingHistory ? <><SpinnerIcon /> Fetching...</> : <><ChartIcon /> Get Full History</>}
                 </ShimmerButton>
@@ -455,8 +697,21 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
                                 <UserIcon />
                               </div>
                               <div>
-                                <div className="font-mono text-xs text-white/70">{truncate(entry.evaluator)}</div>
-                                <div className="text-[9px] text-white/25">Evaluator #{i + 1}</div>
+                                <div className="flex items-center gap-1.5">
+                                  <span className="font-mono text-xs text-white/70">{truncate(entry.evaluator)}</span>
+                                  <button
+                                    onClick={() => copyToClipboard(entry.evaluator)}
+                                    className="text-white/20 hover:text-white/60 transition-colors"
+                                    title="Copy address"
+                                  >
+                                    <CopyIcon copied={copiedAddr === entry.evaluator} />
+                                  </button>
+                                </div>
+                                <div className="text-[9px] text-white/25 mt-0.5">
+                                  {entry.timestamp
+                                    ? formatTimestamp(entry.timestamp)
+                                    : `Evaluator #${i + 1}`}
+                                </div>
                               </div>
                             </div>
                             <div className="flex items-center gap-2">

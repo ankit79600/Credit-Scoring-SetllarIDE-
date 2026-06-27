@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Account,
   Contract,
   Networks,
   TransactionBuilder,
@@ -26,7 +27,7 @@ import {
 
 /** Your deployed Soroban contract ID */
 export const CONTRACT_ADDRESS =
-  "CA4NRFVJXYWSNCQ6K7A44C7UJ3HKFDPEPKQ4M6HJYVBZQKX54KWBZGIH";
+  "CAHR6ZKV2N7U5UMU3HQICGMNZ37YRNAXATPXQTOOPYION3RORD6C2WNR";
 
 /** Network passphrase (testnet by default) */
 export const NETWORK_PASSPHRASE = Networks.TESTNET;
@@ -63,13 +64,21 @@ export async function connectWallet(): Promise<string> {
 
   const allowedResult = await isAllowed();
   if (!allowedResult.isAllowed) {
-    await setAllowed();
-    await requestAccess();
+    // requestAccess opens the permission popup and returns the address directly
+    const { address, error } = await requestAccess();
+    if (error) throw new Error(error);
+    if (!address) throw new Error("Could not retrieve wallet address from Freighter.");
+    return address;
   }
 
-  const { address } = await getAddress();
+  const { address, error } = await getAddress();
+  if (error) throw new Error(error);
   if (!address) {
-    throw new Error("Could not retrieve wallet address from Freighter.");
+    // Already allowed but getAddress failed — fall back to requestAccess
+    const result = await requestAccess();
+    if (result.error) throw new Error(result.error);
+    if (!result.address) throw new Error("Could not retrieve wallet address from Freighter.");
+    return result.address;
   }
   return address;
 }
@@ -109,7 +118,11 @@ export async function callContract(
   sign: boolean = true
 ) {
   const contract = new Contract(CONTRACT_ADDRESS);
-  const account = await server.getAccount(caller);
+  // For read-only simulation, avoid a network round-trip for a potentially
+  // non-existent account by constructing a dummy Account with sequence 0.
+  const account = sign
+    ? await server.getAccount(caller)
+    : new Account(caller, "0");
 
   const tx = new TransactionBuilder(account, {
     fee: "100",
@@ -136,9 +149,11 @@ export async function callContract(
   const prepared = rpc.assembleTransaction(tx, simulated).build();
 
   // Sign with Freighter
-  const { signedTxXdr } = await signTransaction(prepared.toXDR(), {
+  const signResult = await signTransaction(prepared.toXDR(), {
     networkPassphrase: NETWORK_PASSPHRASE,
   });
+  if (signResult.error) throw new Error(signResult.error);
+  const { signedTxXdr } = signResult;
 
   const txToSubmit = TransactionBuilder.fromXDR(
     signedTxXdr,
@@ -278,6 +293,23 @@ export async function getAverageScore(user: string, caller?: string) {
   return readContract(
     "get_average_score",
     [toScValAddress(user)],
+    caller
+  );
+}
+
+/**
+ * Returns the average score only if at least minEvaluators have submitted.
+ * Returns 0 if the threshold is not met.
+ * Calls: get_average_score_if_threshold(user: Address, min_evaluators: u32) -> u32
+ */
+export async function getAverageScoreIfThreshold(
+  user: string,
+  minEvaluators: number,
+  caller?: string
+) {
+  return readContract(
+    "get_average_score_if_threshold",
+    [toScValAddress(user), toScValU32(minEvaluators)],
     caller
   );
 }

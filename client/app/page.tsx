@@ -31,8 +31,6 @@ export default function Home() {
     setIsConnecting(true);
     try {
       setWalletAddress(await connectWallet());
-    } catch {
-      // handled in Contract component
     } finally {
       setIsConnecting(false);
     }
