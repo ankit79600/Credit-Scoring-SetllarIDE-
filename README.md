@@ -1,5 +1,7 @@
 # 💳 Credit Scoring System (Soroban Smart Contract)
 
+🌐 **Live Demo:** [https://my-credit-scoring-1.vercel.app](https://my-credit-scoring-1.vercel.app)
+
 ## 📌 Project Description
 
 This project is a **decentralized credit scoring system** built using **Soroban smart contracts on the Stellar blockchain**. It allows any wallet to submit and retrieve credit scores transparently and securely — without relying on centralized authorities like banks or credit bureaus.
@@ -231,7 +233,7 @@ The UI flags any score with fewer than 3 evaluators as **"Low confidence / Unver
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) v18+
+- [Node.js](https://nodejs.org/) v20.9+
 - [Rust](https://rustup.rs/) + `wasm32-unknown-unknown` target
 - [Stellar CLI](https://developers.stellar.org/docs/tools/developer-tools/cli/install-stellar-cli) (`stellar` or `soroban`)
 - [Freighter Wallet](https://freighter.app/) browser extension set to **Testnet**
