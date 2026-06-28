@@ -312,7 +312,7 @@ All 8 unit tests should pass — covering submit, update, average, threshold, em
 |---|---|
 | **Name** | Ankit Patel |
 | **Email** | ankitpatel79600@gmail.com |
-| **GitHub** | [github.com/ankit7960](https://github.com/ankit7960) |
+| **GitHub** | [github.com/ankit7960](https://github.com/ankit79600) |
 | **LinkedIn** | [linkedin.com/in/ankitpatel79600](https://www.linkedin.com/in/ankitpatel79600) |
 
 ---
