@@ -2,6 +2,8 @@
 
 A decentralized credit scoring system built on the **Stellar blockchain** using **Soroban smart contracts**. Multiple evaluators can submit credit scores for any user address, and anyone can query the aggregated results on-chain.
 
+**Live Demo:** [https://my-credit-scoring-1.vercel.app](https://my-credit-scoring-1.vercel.app)
+
 ---
 
 ## How It Works
