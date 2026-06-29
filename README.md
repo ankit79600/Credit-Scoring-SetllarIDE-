@@ -39,9 +39,20 @@ The goal is to create a trust-based financial identity system where creditworthi
 ## 📂 Project Structure
 
 ```
-├── contract/        # Soroban smart contract code
-├── frontend/        # UI for interacting with contract
-├── README.md
+├── contract/                              # Soroban smart contract (Rust)
+│   ├── Cargo.toml                         # Workspace manifest
+│   └── contracts/contract/
+│       ├── Cargo.toml                     # Contract package
+│       ├── Makefile                       # Build & test targets
+│       └── src/
+│           ├── lib.rs                     # Contract implementation
+│           └── test.rs                    # Unit tests
+├── client/                                # Next.js frontend
+│   ├── hooks/
+│   │   └── contract.ts                    # Integration hook (Stellar SDK)
+│   └── components/
+│       └── Contract.tsx                   # UI component
+└── README.md
 ```
 
 ---
