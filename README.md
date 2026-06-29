@@ -1,142 +1,154 @@
-# 💳 Credit Scoring System (Soroban Smart Contract)
+# Credit Scoring System — Soroban Smart Contract
 
-## 📌 Project Description
-
-This project is a **decentralized credit scoring system** built using **Soroban smart contracts on the Stellar blockchain**. It allows users to store and retrieve credit scores transparently and securely without relying on centralized authorities.
-
-The goal is to create a trust-based financial identity system where creditworthiness is verifiable on-chain.
+A decentralized credit scoring system built on the **Stellar blockchain** using **Soroban smart contracts**. Multiple evaluators can submit credit scores for any user address, and anyone can query the aggregated results on-chain.
 
 ---
 
-## 🚀 What It Does
+## How It Works
 
-* Assigns a credit score to a user (wallet address)
-* Retrieves the credit score of any user
-* Stores data securely on-chain
-* Ensures transparency and immutability
-
----
-
-## ✨ Features
-
-* 🔐 Decentralized & secure
-* ⚡ Fast and low-cost transactions (Stellar network)
-* 📊 On-chain credit score storage
-* 👤 Wallet-based identity (no login required)
-* 🔎 Public verification of credit scores
+- Any address can act as an **evaluator** and submit a credit score (0–1000) for any user
+- If an evaluator submits again for the same user, their previous score is **updated** (not duplicated)
+- Scores from all evaluators are stored on-chain and can be queried at any time
+- The contract computes the **average score** across all evaluators
 
 ---
 
-## 🛠️ Tech Stack
+## Contract Functions
 
-* **Blockchain:** Stellar (Soroban)
-* **Smart Contract Language:** Rust
-* **Frontend:** (Add your frontend tech, e.g., React / HTML / JS)
-* **Tools:** Soroban CLI, Stellar SDK
+| Function | Parameters | Returns | Description |
+|----------|-----------|---------|-------------|
+| `submit_score` | `user: Address, score: u32, evaluator: Address` | — | Submit or update a score. Requires evaluator auth. Score must be 0–1000. |
+| `get_scores` | `user: Address` | `Vec<ScoreEntry>` | Return all evaluator score entries for a user |
+| `get_evaluator_count` | `user: Address` | `u32` | Return the number of unique evaluators for a user |
+| `get_average_score` | `user: Address` | `u32` | Return the average score across all evaluators |
+
+**ScoreEntry** fields: `evaluator: Address`, `score: u32`
 
 ---
 
-## 📂 Project Structure
+## Deployed Contract
+
+- **Network:** Stellar Testnet
+- **Contract ID:** `CA4NRFVJXYWSNCQ6K7A44C7UJ3HKFDPEPKQ4M6HJYVBZQKX54KWBZGIH`
+- **RPC URL:** `https://soroban-testnet.stellar.org`
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Blockchain | Stellar (Soroban) |
+| Smart Contract | Rust (`soroban-sdk = "25"`) |
+| Frontend | Next.js (TypeScript) |
+| Wallet | Freighter (`@stellar/freighter-api`) |
+| Stellar SDK | `@stellar/stellar-sdk` |
+
+---
+
+## Project Structure
 
 ```
-├── contract/                              # Soroban smart contract (Rust)
+├── contract/
 │   ├── Cargo.toml                         # Workspace manifest
 │   └── contracts/contract/
 │       ├── Cargo.toml                     # Contract package
 │       ├── Makefile                       # Build & test targets
 │       └── src/
 │           ├── lib.rs                     # Contract implementation
-│           └── test.rs                    # Unit tests
-├── client/                                # Next.js frontend
+│           └── test.rs                    # Unit tests (5 tests)
+├── client/
 │   ├── hooks/
-│   │   └── contract.ts                    # Integration hook (Stellar SDK)
-│   └── components/
-│       └── Contract.tsx                   # UI component
+│   │   └── contract.ts                    # Stellar SDK integration layer
+│   ├── components/
+│   │   ├── Contract.tsx                   # Main UI component
+│   │   └── Navbar.tsx
+│   └── app/
+│       └── page.tsx                       # Entry page
 └── README.md
 ```
 
 ---
 
-## 🔗 Deployed Smart Contract
+## Local Setup
 
-* **Contract Address:**
-  CA4NRFVJXYWSNCQ6K7A44C7UJ3HKFDPEPKQ4M6HJYVBZQKX54KWBZGIH
+### Prerequisites
 
----
+- [Rust](https://www.rust-lang.org/tools/install)
+- [Stellar CLI](https://developers.stellar.org/docs/tools/stellar-cli)
+- [Node.js](https://nodejs.org/) (v18+)
+- [Freighter browser extension](https://freighter.app/)
 
-## 🖼️ Frontend Preview
-
-### 🔹 UI Screenshot
-
-
-<img width="1904" height="848" alt="Screenshot 2026-03-20 145752" src="https://github.com/user-attachments/assets/0b301c5c-4a0d-4c05-a7c6-812a01654740" />
-
-
----
-
-## 🧾 Smart Contract Deployment Proof
-
-### 🔹 Contract Address Screenshot
-<img width="1482" height="586" alt="Screenshot 2026-03-20 150040" src="https://github.com/user-attachments/assets/0116c524-7ce6-4e28-bd18-ab1ffc99fc42" />
-
-
----
-
-## ⚙️ How to Run Locally
-
-### 1️⃣ Clone the repository
+### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/credit-scoring-system.git
-cd credit-scoring-system
+git clone https://github.com/ankit79600/Credit-Scoring-SetllarIDE-
+cd Credit-Scoring-SetllarIDE-
 ```
 
-### 2️⃣ Build the contract
+### 2. Build and test the smart contract
 
 ```bash
-soroban contract build
+cd contract
+make test      # builds the contract and runs all unit tests
+make build     # build only (outputs .wasm to target/wasm32v1-none/release/)
 ```
 
-### 3️⃣ Deploy the contract
+### 3. Deploy to testnet
 
 ```bash
-soroban contract deploy \
---wasm target/wasm32-unknown-unknown/release/your_contract.wasm \
---network testnet
+stellar contract deploy \
+  --wasm contract/contracts/contract/target/wasm32v1-none/release/contract.wasm \
+  --network testnet
 ```
 
-### 4️⃣ Run frontend
+Copy the returned contract ID into `client/hooks/contract.ts` → `CONTRACT_ADDRESS`.
+
+### 4. Run the frontend
 
 ```bash
-cd frontend
+cd client
 npm install
-npm start
+npm run dev
 ```
 
----
-
-## 📬 Contact
-
-* **Name:** Ankit Patel
-* **Email:** ankitpatel79600@gmail.com
-* **GitHub:** https://github.com/ankit7960
-* **LinkedIn:** www.linkedin.com/in/ankitpatel79600
+Open [http://localhost:3000](http://localhost:3000) and connect your Freighter wallet set to **Testnet**.
 
 ---
 
-## 🌍 Future Improvements
+## Frontend Preview
 
-* AI-based credit scoring model
-* Integration with financial APIs
-* User dashboard with analytics
-* Mobile app support
+<img width="1904" height="848" alt="Credit Scoring UI" src="https://github.com/user-attachments/assets/0b301c5c-4a0d-4c05-a7c6-812a01654740" />
 
 ---
 
-## 📄 License
+## Deployment Proof
 
-This project is licensed under the MIT License.
+<img width="1482" height="586" alt="Contract deployment" src="https://github.com/user-attachments/assets/0116c524-7ce6-4e28-bd18-ab1ffc99fc42" />
 
 ---
 
-⭐ If you like this project, give it a star!
+## Score Rating Scale
+
+| Range | Rating |
+|-------|--------|
+| 800 – 1000 | Excellent |
+| 700 – 799 | Good |
+| 600 – 699 | Fair |
+| 400 – 599 | Poor |
+| 0 – 399 | Very Poor |
+
+---
+
+## Author
+
+**Ankit Patel**
+- Email: ankitpatel79600@gmail.com
+- GitHub: [ankit79600](https://github.com/ankit79600)
+- LinkedIn: [ankitpatel79600](https://www.linkedin.com/in/ankitpatel79600)
+
+---
+
+## License
+
+MIT
