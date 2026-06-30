@@ -45,6 +45,7 @@ interface NavbarProps {
   onConnect: () => Promise<void>;
   onDisconnect: () => void;
   isConnecting: boolean;
+  onOpenGuide?: () => void;
 }
 
 export default function Navbar({
@@ -52,6 +53,7 @@ export default function Navbar({
   onConnect,
   onDisconnect,
   isConnecting,
+  onOpenGuide,
 }: NavbarProps) {
   const [copied, setCopied] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -112,7 +114,20 @@ export default function Navbar({
         </div>
 
         {/* Right side */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
+          {onOpenGuide && (
+            <button
+              onClick={onOpenGuide}
+              className="hidden sm:flex items-center gap-1.5 rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-1.5 text-xs text-white/40 hover:border-white/[0.12] hover:text-white/70 transition-all"
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                <line x1="12" y1="17" x2="12.01" y2="17" />
+              </svg>
+              Guide
+            </button>
+          )}
           <Badge variant="success">
             <span className="h-1.5 w-1.5 rounded-full bg-[#34d399] animate-pulse" />
             {NETWORK}
