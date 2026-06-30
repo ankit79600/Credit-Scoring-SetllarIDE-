@@ -4,17 +4,25 @@ import { useState, useEffect, useCallback } from "react";
 import { Meteors } from "@/components/ui/meteors";
 import Navbar from "@/components/Navbar";
 import ContractUI from "@/components/Contract";
+import OnboardingModal, { useOnboarding } from "@/components/OnboardingModal";
+import FeedbackModal, { FeedbackTrigger, useFeedback } from "@/components/FeedbackModal";
 import {
   connectWallet,
   getWalletAddress,
   checkConnection,
 } from "@/hooks/contract";
+import { trackWalletConnect, trackWalletDisconnect } from "@/lib/posthog";
 
 export default function Home() {
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  const { showOnboarding, completeOnboarding, resetOnboarding } = useOnboarding();
+  const { showFeedback, openFeedback, closeFeedback } = useFeedback();
 
   useEffect(() => {
+    setMounted(true);
     (async () => {
       try {
         if (await checkConnection()) {
@@ -30,13 +38,16 @@ export default function Home() {
   const handleConnect = useCallback(async () => {
     setIsConnecting(true);
     try {
-      setWalletAddress(await connectWallet());
+      const addr = await connectWallet();
+      setWalletAddress(addr);
+      trackWalletConnect(addr);
     } finally {
       setIsConnecting(false);
     }
   }, []);
 
   const handleDisconnect = useCallback(() => {
+    trackWalletDisconnect();
     setWalletAddress(null);
   }, []);
 
@@ -59,11 +70,12 @@ export default function Home() {
         onConnect={handleConnect}
         onDisconnect={handleDisconnect}
         isConnecting={isConnecting}
+        onOpenGuide={resetOnboarding}
       />
 
       {/* Hero + Content */}
-      <main className="relative z-10 flex flex-1 w-full max-w-5xl mx-auto flex-col items-center px-6 pt-10 pb-16">
-        {/* Hero — compact */}
+      <main className="relative z-10 flex flex-1 w-full max-w-5xl mx-auto flex-col items-center px-4 sm:px-6 pt-10 pb-20">
+        {/* Hero */}
         <div className="mb-10 text-center animate-fade-in-up">
           <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.03] px-4 py-1.5 text-sm text-white/50 backdrop-blur-sm">
             <span className="relative flex h-2 w-2">
@@ -74,7 +86,7 @@ export default function Home() {
           </div>
 
           <h1 className="mb-3">
-            <span className="block text-4xl sm:text-5xl font-bold tracking-tight leading-[1.1]">
+            <span className="block text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight leading-[1.1]">
               <span className="bg-gradient-to-r from-[#7c6cf0] via-[#4fc3f7] to-[#7c6cf0] bg-[length:200%_auto] animate-gradient-shift bg-clip-text text-transparent">
                 Credit Scoring System
               </span>
@@ -85,7 +97,7 @@ export default function Home() {
             Submit, track, and verify credit scores — immutably on Stellar.
           </p>
 
-          {/* Inline stats */}
+          {/* Stats */}
           <div className="mt-6 flex items-center justify-center gap-6 sm:gap-10 animate-fade-in-up-delayed">
             {[
               { label: "Finality", value: "~5s" },
@@ -109,20 +121,13 @@ export default function Home() {
 
         {/* Footer */}
         <div className="mt-10 flex flex-col items-center gap-4 animate-fade-in">
-          {/* Credit score flow */}
           <div className="flex items-center gap-3 text-xs text-white/20">
             {["Submit", "Average", "Trusted"].map((step, i) => (
               <span key={step} className="flex items-center gap-3">
                 <span className="flex items-center gap-1.5">
-                  <span
-                    className={`h-1.5 w-1.5 rounded-full ${
-                      i === 0
-                        ? "bg-[#7c6cf0]/50"
-                        : i === 1
-                          ? "bg-[#fbbf24]/50"
-                          : "bg-[#34d399]/50"
-                    }`}
-                  />
+                  <span className={`h-1.5 w-1.5 rounded-full ${
+                    i === 0 ? "bg-[#7c6cf0]/50" : i === 1 ? "bg-[#fbbf24]/50" : "bg-[#34d399]/50"
+                  }`} />
                   <span className="font-mono">{step}</span>
                 </span>
                 {i < 2 && (
@@ -133,15 +138,42 @@ export default function Home() {
               </span>
             ))}
           </div>
-          <div className="flex items-center gap-4 text-[10px] text-white/15">
+          <div className="flex flex-wrap items-center justify-center gap-4 text-[10px] text-white/15">
             <span>Stellar Network</span>
             <span className="h-2.5 w-px bg-white/10" />
             <span>Freighter Wallet</span>
             <span className="h-2.5 w-px bg-white/10" />
             <span>Soroban Smart Contracts</span>
+            <span className="h-2.5 w-px bg-white/10" />
+            {mounted && (
+              <button
+                onClick={resetOnboarding}
+                className="text-white/20 hover:text-white/50 transition-colors underline underline-offset-2"
+              >
+                How it works
+              </button>
+            )}
           </div>
         </div>
       </main>
+
+      {/* Onboarding Modal — shown on first visit */}
+      {mounted && showOnboarding && (
+        <OnboardingModal
+          onComplete={completeOnboarding}
+          onConnect={handleConnect}
+        />
+      )}
+
+      {/* Feedback Modal */}
+      {mounted && showFeedback && (
+        <FeedbackModal onClose={closeFeedback} />
+      )}
+
+      {/* Floating Feedback Button */}
+      {mounted && !showFeedback && (
+        <FeedbackTrigger onClick={openFeedback} />
+      )}
     </div>
   );
 }
