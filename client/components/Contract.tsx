@@ -8,6 +8,7 @@ import {
   getAverageScore,
   CONTRACT_ADDRESS,
 } from "@/hooks/contract";
+import { trackContractInteraction } from "@/lib/posthog";
 import { AnimatedCard } from "@/components/ui/animated-card";
 import { Spotlight } from "@/components/ui/spotlight";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
@@ -293,6 +294,7 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
         averageScore: avgResult ?? 0,
         scores: (scoresResult ?? []) as ScoreEntry[],
       });
+      trackContractInteraction("lookup_score", { evaluator_count: countResult ?? 0 });
       // Sync URL so this lookup is shareable
       const url = new URL(window.location.href);
       url.searchParams.set("user", address);
@@ -339,6 +341,7 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
     setTxStatus("Awaiting signature...");
     try {
       await submitScore(walletAddress, submitUser.trim(), scoreNum, walletAddress);
+      trackContractInteraction("submit_score", { score: scoreNum });
       setTxStatus("Score submitted on-chain!");
       setSubmitUser("");
       setSubmitScoreValue("");
@@ -360,6 +363,7 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
     setHistoryData(null);
     try {
       const result = await getScores(historyUser.trim(), walletAddress || undefined);
+      trackContractInteraction("get_history", { entry_count: (result ?? []).length });
       setHistoryData((result ?? []) as ScoreEntry[]);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Query failed");
