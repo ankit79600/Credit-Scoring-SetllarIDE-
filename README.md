@@ -49,44 +49,46 @@ This dApp lets anyone submit and look up credit scores on-chain — without rely
 
 ## 📂 Project Structure
 
-```
-├── contract/
-│   └── contracts/contract/
-│       ├── src/
-│       │   ├── lib.rs        # Contract logic (submit, get, average, threshold)
-│       │   └── test.rs       # 8 unit tests
-│       └── Cargo.toml
-├── client/
-│   ├── app/
-│   │   ├── page.tsx          # Root page — wallet + onboarding + feedback state
-│   │   └── layout.tsx        # PostHogProvider, Sentry, global CSS
-│   ├── components/
-│   │   ├── Navbar.tsx         # Wallet connect/disconnect, Guide button
-│   │   ├── Contract.tsx       # 3-tab UI: Lookup / Submit / History
-│   │   ├── OnboardingModal.tsx  # Step-by-step new user guide
-│   │   ├── FeedbackModal.tsx    # Star rating + comment feedback form
-│   │   ├── PostHogProvider.tsx  # Analytics provider + page view tracker
-│   │   ├── ErrorBoundary.tsx    # Sentry-wired error boundary
-│   │   └── ui/
-│   │       ├── animated-card.tsx
-│   │       ├── meteors.tsx
-│   │       ├── spotlight.tsx
-│   │       ├── shimmer-button.tsx
-│   │       └── badge.tsx
-│   ├── hooks/
-│   │   └── contract.ts        # Freighter wallet + Soroban RPC integration
-│   ├── lib/
-│   │   ├── posthog.ts         # PostHog init + tracking helpers
-│   │   └── utils.ts
-│   ├── sentry.client.config.ts
-│   ├── sentry.server.config.ts
-│   ├── sentry.edge.config.ts
-│   └── .env.example
-├── scripts/
-│   ├── deploy-contract.sh     # Build + deploy Soroban contract
-│   ├── fund-testnet.sh        # Fund address via Friendbot
-│   └── run-tests.sh           # Run contract unit tests
-└── README.md
+```mermaid
+graph TD
+    ROOT["🗂️ credit-scoring-system"]
+
+    ROOT --> CONTRACT["📦 contract/"]
+    ROOT --> CLIENT["💻 client/"]
+    ROOT --> SCRIPTS["⚙️ scripts/"]
+    ROOT --> README_F["📄 README.md"]
+
+    CONTRACT --> CSRC["src/"]
+    CSRC --> LIBRS["lib.rs — Contract logic"]
+    CSRC --> TESTRS["test.rs — 8 unit tests"]
+    CONTRACT --> CARGO["Cargo.toml"]
+
+    CLIENT --> APP["app/"]
+    CLIENT --> COMP["components/"]
+    CLIENT --> HOOKS["hooks/"]
+    CLIENT --> LIB["lib/"]
+    CLIENT --> SENTRY["sentry.*.config.ts"]
+    CLIENT --> ENV[".env.example"]
+
+    APP --> PAGE["page.tsx — Main UI + state"]
+    APP --> LAYOUT["layout.tsx — Providers + CSS"]
+
+    COMP --> NAVBAR["Navbar.tsx — Wallet connect"]
+    COMP --> CONTRACT_UI["Contract.tsx — Lookup / Submit / History"]
+    COMP --> ONBOARD["OnboardingModal.tsx — 4-step guide"]
+    COMP --> FEED["FeedbackModal.tsx — Star rating"]
+    COMP --> PH["PostHogProvider.tsx — Analytics"]
+    COMP --> EB["ErrorBoundary.tsx — Sentry"]
+    COMP --> UI_DIR["ui/ — animated-card · meteors · shimmer-button"]
+
+    HOOKS --> CTR["contract.ts — Freighter + Soroban RPC"]
+
+    LIB --> PH_LIB["posthog.ts — PostHog init"]
+    LIB --> UTILS["utils.ts"]
+
+    SCRIPTS --> DEPLOY["deploy-contract.sh"]
+    SCRIPTS --> FUND["fund-testnet.sh"]
+    SCRIPTS --> TEST["run-tests.sh"]
 ```
 
 ---
