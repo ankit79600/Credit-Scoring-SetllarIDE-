@@ -183,10 +183,10 @@ pub struct ScoreEntry {
 <img width="1482" height="586" alt="Contract Deployment Address" src="https://github.com/user-attachments/assets/0116c524-7ce6-4e28-bd18-ab1ffc99fc42" />
 
 ### Analytics & Monitoring
-![PostHog Analytics — real events from the live Vercel deployment](screenshots/posthog-analytics.png)
+<img width="1514" height="769" alt="image" src="https://github.com/user-attachments/assets/c81061b8-727f-4cb8-911d-7c621cfc52d7" />
 
 ### Mobile Responsive Design
-![Mobile view — iPhone 14 Pro dimensions (430px)](screenshots/mobile-view.png)
+<img width="225" height="472" alt="Screenshot 2026-07-01 143858" src="https://github.com/user-attachments/assets/2b7bf516-bd4a-4871-a327-7f2f9f7a64d2" />
 
 ---
 
