@@ -166,9 +166,9 @@ function getScoreConfig(score: number): { color: string; bg: string; label: stri
 
 // ── Utilities ────────────────────────────────────────────────
 
-function formatTimestamp(ts: number | undefined): string {
+function formatTimestamp(ts: number | bigint | undefined): string {
   if (!ts) return "—";
-  return new Date(ts * 1000).toLocaleDateString("en-US", {
+  return new Date(Number(ts) * 1000).toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
@@ -223,7 +223,7 @@ type Tab = "lookup" | "submit" | "history";
 interface ScoreEntry {
   evaluator: string;
   score: number;
-  timestamp?: number;
+  timestamp?: number | bigint;
 }
 
 interface ContractUIProps {
@@ -609,11 +609,14 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
                 />
                 <Input
                   label="Score (0-1000)"
-                  type="number"
-                  min="0"
-                  max="1000"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   value={submitScoreValue}
-                  onChange={(e) => setSubmitScoreValue(e.target.value)}
+                  onChange={(e) => {
+                    const v = e.target.value.replace(/[^0-9]/g, "");
+                    if (v === "" || (parseInt(v, 10) <= 1000)) setSubmitScoreValue(v);
+                  }}
                   placeholder="e.g. 750"
                 />
 
