@@ -186,7 +186,7 @@ pub struct ScoreEntry {
 ![PostHog Analytics — real events from the live Vercel deployment](screenshots/posthog-analytics.png)
 
 ### Mobile Responsive Design
-![Mobile view — iPhone 14 Pro dimensions (430px)](screenshots/mobile-view.png)
+<img width="225" height="472" alt="Screenshot 2026-07-01 143858" src="https://github.com/user-attachments/assets/2b7bf516-bd4a-4871-a327-7f2f9f7a64d2" />
 
 ---
 
