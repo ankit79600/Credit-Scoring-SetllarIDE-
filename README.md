@@ -324,16 +324,17 @@ All 8 unit tests should pass.
 
 ## 🎥 Demo Video
 
-> Record a Loom video showing the full flow:
-> 1. Open the app — onboarding modal appears
-> 2. Connect Freighter wallet
-> 3. Fund with Friendbot
-> 4. Submit a credit score (sign with Freighter)
-> 5. Look up the score
-> 6. Show mobile view
-> 7. Show PostHog dashboard with events
->
-> **Loom Link:** _[Add your Loom URL here after recording]_
+[![Watch Demo](https://cdn.loom.com/sessions/thumbnails/fe542c9d3ec44064aeda35fcf7848c4e-with-play.gif)](https://www.loom.com/share/fe542c9d3ec44064aeda35fcf7848c4e)
+
+**[Watch on Loom →](https://www.loom.com/share/fe542c9d3ec44064aeda35fcf7848c4e)**
+
+The demo covers:
+1. App loads — onboarding modal appears
+2. Connect Freighter wallet
+3. Fund with Friendbot
+4. Submit a credit score (sign with Freighter)
+5. Look up the score
+6. Show PostHog analytics dashboard
 
 ---
 
