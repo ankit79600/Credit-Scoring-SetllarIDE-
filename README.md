@@ -186,7 +186,7 @@ pub struct ScoreEntry {
 ![PostHog Analytics — real events from the live Vercel deployment](screenshots/posthog-analytics.png)
 
 ### Mobile Responsive Design
-> The app uses Tailwind CSS responsive prefixes (`sm:`, `md:`) throughout — it's fully usable on mobile. Screenshot: visit the live URL on a phone or use Chrome DevTools mobile view.
+![Mobile view — iPhone 14 Pro dimensions (430px)](screenshots/mobile-view.png)
 
 ---
 
