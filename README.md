@@ -50,7 +50,7 @@ This dApp lets anyone submit and look up credit scores on-chain — without rely
 ## 📂 Project Structure
 
 ```mermaid
-graph TD
+graph LR
     ROOT["🗂️ credit-scoring-system"]
 
     ROOT --> CONTRACT["📦 contract/"]
