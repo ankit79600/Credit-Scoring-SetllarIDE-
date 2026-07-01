@@ -183,7 +183,7 @@ pub struct ScoreEntry {
 <img width="1482" height="586" alt="Contract Deployment Address" src="https://github.com/user-attachments/assets/0116c524-7ce6-4e28-bd18-ab1ffc99fc42" />
 
 ### Analytics & Monitoring
-> PostHog dashboard screenshot — add yours after deploying and capturing real events at [app.posthog.com](https://app.posthog.com)
+![PostHog Analytics — real events from the live Vercel deployment](screenshots/posthog-analytics.png)
 
 ### Mobile Responsive Design
 > The app uses Tailwind CSS responsive prefixes (`sm:`, `md:`) throughout — it's fully usable on mobile. Screenshot: visit the live URL on a phone or use Chrome DevTools mobile view.
