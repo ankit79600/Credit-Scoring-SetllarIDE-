@@ -29,8 +29,11 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             contract/target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('contract/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-${{ hashFiles('contract/Cargo.toml') }}
           restore-keys: ${{ runner.os }}-cargo-
+
+      - name: Regenerate Cargo.lock on Linux
+        run: rm -f Cargo.lock && cargo generate-lockfile
 
       - name: Build contract (WASM)
         run: cargo build --target wasm32v1-none --release
