@@ -5,6 +5,46 @@ on:
     branches: [main]
 
 jobs:
+  deploy-contract:
+    name: Deploy Smart Contract to Stellar Testnet
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: contract
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32v1-none
+
+      - name: Cache Rust dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            contract/target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('contract/Cargo.toml') }}
+          restore-keys: ${{ runner.os }}-cargo-
+
+      - name: Install Stellar CLI
+        run: cargo install stellar-cli --features opt --locked
+
+      - name: Build contract (WASM)
+        run: cargo build --target wasm32v1-none --release
+
+      - name: Deploy contract to Testnet
+        run: |
+          stellar contract deploy \
+            --wasm target/wasm32v1-none/release/contract.wasm \
+            --network testnet \
+            --source-account ${{ secrets.STELLAR_SECRET_KEY }}
+        env:
+          STELLAR_SECRET_KEY: ${{ secrets.STELLAR_SECRET_KEY }}
+
   deploy-frontend:
     name: Deploy Frontend to Vercel
     runs-on: ubuntu-latest
