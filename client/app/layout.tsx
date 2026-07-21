@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/react";
+import FeedbackModal from "@/components/FeedbackModal";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -13,9 +15,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Credit Score on Stellar",
+  title: "Stellar MicroLoan Protocol",
   description:
-    "Submit, track, and verify credit scores immutably on Stellar with Soroban smart contracts.",
+    "A trustless microloan protocol where your on-chain reputation becomes real access to capital — built on Stellar's low-cost, instant-settlement rails.",
+  openGraph: {
+    title: "Stellar MicroLoan Protocol",
+    description: "Decentralized microloans powered by reputation-based credit scoring on Stellar",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
@@ -30,6 +37,8 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-[#050510]">
         {children}
+        <FeedbackModal />
+        <Analytics />
       </body>
     </html>
   );
