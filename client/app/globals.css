@@ -104,3 +104,50 @@ body {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
+
+/* ── Mobile touch improvements ── */
+
+@media (max-width: 640px) {
+  input, textarea, button {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  /* Prevent zoom on input focus on iOS */
+  input[type="text"],
+  input[type="number"],
+  textarea {
+    font-size: 16px;
+  }
+}
+
+/* ── Safe area insets (iPhone notch) ── */
+
+@supports (padding: max(0px)) {
+  .navbar-safe {
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+
+  .bottom-safe {
+    padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+  }
+}
+
+/* ── Focus visible styles ── */
+
+*:focus-visible {
+  outline: 2px solid rgba(124, 108, 240, 0.5);
+  outline-offset: 2px;
+}
+
+/* ── Smooth page transitions ── */
+
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.page-enter {
+  animation: page-enter 0.35s ease-out both;
+}
