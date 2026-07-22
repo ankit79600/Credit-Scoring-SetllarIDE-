@@ -80,7 +80,6 @@ impl LoanPool {
         admin: Address,
         credit_score_contract: Address,
         token_contract: Address,
-        reputation_stake_contract: Address,
         min_credit_score: u32,
         interest_rate_bps: u32,
         max_loan_amount: i128,
@@ -101,9 +100,6 @@ impl LoanPool {
             .set(&DataKey::TokenContract, &token_contract);
         env.storage()
             .instance()
-            .set(&DataKey::ReputationStakeContract, &reputation_stake_contract);
-        env.storage()
-            .instance()
             .set(&DataKey::MinCreditScore, &min_credit_score);
         env.storage()
             .instance()
@@ -116,6 +112,16 @@ impl LoanPool {
         env.storage().instance().set(&DataKey::TotalDeposits, &0i128);
         env.storage().instance().set(&DataKey::TotalLoans, &0i128);
         env.storage().instance().set(&DataKey::TotalInterest, &0i128);
+    }
+
+    /// Admin sets the ReputationStake contract address after deployment
+    /// (avoids circular dependency at initialization time).
+    pub fn set_reputation_stake(env: Env, reputation_stake_contract: Address) {
+        let admin: Address = env.storage().instance().get(&DataKey::Admin).unwrap();
+        admin.require_auth();
+        env.storage()
+            .instance()
+            .set(&DataKey::ReputationStakeContract, &reputation_stake_contract);
     }
 
     // ── Liquidity Provider flows ───────────────────────────────────────────
