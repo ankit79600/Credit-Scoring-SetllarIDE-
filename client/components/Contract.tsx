@@ -578,15 +578,20 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
                             const cfg = getScoreConfig(entry.score);
                             return (
                               <div key={i} className="flex items-center justify-between rounded-lg px-3 py-2 border border-white/[0.04] bg-white/[0.01]">
-                                <div className="flex items-center gap-2">
-                                  <span className="font-mono text-xs text-white/50">{truncate(entry.evaluator)}</span>
-                                  <button
-                                    onClick={() => copyToClipboard(entry.evaluator)}
-                                    className="text-white/20 hover:text-white/60 transition-colors"
-                                    title="Copy address"
-                                  >
-                                    <CopyIcon copied={copiedAddr === entry.evaluator} />
-                                  </button>
+                                <div className="flex flex-col gap-0.5">
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-mono text-xs text-white/50">{truncate(entry.evaluator)}</span>
+                                    <button
+                                      onClick={() => copyToClipboard(entry.evaluator)}
+                                      className="text-white/20 hover:text-white/60 transition-colors"
+                                      title="Copy address"
+                                    >
+                                      <CopyIcon copied={copiedAddr === entry.evaluator} />
+                                    </button>
+                                  </div>
+                                  {entry.timestamp ? (
+                                    <span className="text-[9px] text-white/25">{formatTimestamp(entry.timestamp)}</span>
+                                  ) : null}
                                 </div>
                                 <div className="flex items-center gap-2">
                                   <div className={cn("h-1.5 w-1.5 rounded-full", cfg.bg)} />
