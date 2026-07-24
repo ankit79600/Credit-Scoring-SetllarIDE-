@@ -561,6 +561,29 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
                       </div>
                     </div>
 
+                    {/* Score progress bar */}
+                    {lookupData.averageScore > 0 && (
+                      <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="text-[10px] font-medium uppercase tracking-wider text-white/25">Score Position</span>
+                          <span className={cn("text-[10px] font-mono font-semibold", meetsThreshold ? getScoreConfig(lookupData.averageScore).color : "text-white/30")}>
+                            {lookupData.averageScore} / 1000
+                          </span>
+                        </div>
+                        <div className="relative h-2.5 rounded-full bg-white/[0.04] overflow-hidden">
+                          <div
+                            className={cn("h-full rounded-full transition-all duration-700", meetsThreshold ? getScoreConfig(lookupData.averageScore).bg : "bg-white/20")}
+                            style={{ width: `${(lookupData.averageScore / 1000) * 100}%` }}
+                          />
+                        </div>
+                        <div className="flex justify-between mt-2">
+                          {["Very Poor", "Poor", "Fair", "Good", "Excellent"].map((label) => (
+                            <span key={label} className="text-[8px] text-white/15">{label}</span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
                     {/* Bar chart */}
                     {lookupData.scores.length > 0 && (
                       <ScoreBarChart scores={lookupData.scores} />
