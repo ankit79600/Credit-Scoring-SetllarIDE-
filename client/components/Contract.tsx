@@ -620,6 +620,45 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
                   placeholder="e.g. 750"
                 />
 
+                {/* Visual score slider */}
+                {(() => {
+                  const val = submitScoreValue !== "" ? parseInt(submitScoreValue, 10) : 0;
+                  const cfg = getScoreConfig(isNaN(val) ? 0 : val);
+                  const colorMap: Record<string, string> = {
+                    "bg-[#34d399]": "#34d399",
+                    "bg-[#4fc3f7]": "#4fc3f7",
+                    "bg-[#fbbf24]": "#fbbf24",
+                    "bg-[#fb923c]": "#fb923c",
+                    "bg-[#f87171]": "#f87171",
+                  };
+                  const color = colorMap[cfg.bg] ?? "#7c6cf0";
+                  const pct = isNaN(val) ? 0 : (val / 1000) * 100;
+                  return (
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-medium uppercase tracking-wider text-white/30">Visual Range</span>
+                        <span className={cn("text-xs font-semibold", cfg.color)}>{cfg.label}</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="0"
+                        max="1000"
+                        value={isNaN(val) ? 0 : val}
+                        onChange={(e) => setSubmitScoreValue(e.target.value)}
+                        className="score-slider"
+                        style={{ "--slider-color": color, "--slider-pct": `${pct}%` } as React.CSSProperties}
+                      />
+                      <div className="flex justify-between text-[9px] text-white/20">
+                        <span>Very Poor</span>
+                        <span>Poor</span>
+                        <span>Fair</span>
+                        <span>Good</span>
+                        <span>Excellent</span>
+                      </div>
+                    </div>
+                  );
+                })()}
+
                 {walletAddress ? (
                   <ShimmerButton onClick={handleSubmitScore} disabled={isSubmitting} shimmerColor="#7c6cf0" className="w-full">
                     {isSubmitting ? <><SpinnerIcon /> Submitting...</> : <><StarIcon /> Submit Score</>}
