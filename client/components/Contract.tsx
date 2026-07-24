@@ -243,6 +243,7 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
   const [submitUser, setSubmitUser] = useState("");
   const [submitScoreValue, setSubmitScoreValue] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [txHash, setTxHash] = useState<string | null>(null);
 
   // Lookup state
   const [lookupUser, setLookupUser] = useState("");
@@ -337,15 +338,17 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
       return setError("Score must be between 0 and 1000");
     }
     setError(null);
+    setTxHash(null);
     setIsSubmitting(true);
     setTxStatus("Awaiting signature...");
     try {
-      await submitScore(walletAddress, submitUser.trim(), scoreNum, walletAddress);
+      const hash = await submitScore(walletAddress, submitUser.trim(), scoreNum, walletAddress);
       trackContractInteraction("submit_score", { score: scoreNum });
+      setTxHash(hash);
       setTxStatus("Score submitted on-chain!");
       setSubmitUser("");
       setSubmitScoreValue("");
-      setTimeout(() => setTxStatus(null), 5000);
+      setTimeout(() => { setTxStatus(null); setTxHash(null); }, 8000);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Transaction failed");
       setTxStatus(null);
@@ -405,11 +408,23 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
       )}
 
       {txStatus && (
-        <div className="mb-4 flex items-center gap-3 rounded-xl border border-[#34d399]/15 bg-[#34d399]/[0.05] px-4 py-3 backdrop-blur-sm shadow-[0_0_30px_rgba(52,211,153,0.05)] animate-slide-down">
-          <span className="text-[#34d399]">
+        <div className="mb-4 flex items-start gap-3 rounded-xl border border-[#34d399]/15 bg-[#34d399]/[0.05] px-4 py-3 backdrop-blur-sm shadow-[0_0_30px_rgba(52,211,153,0.05)] animate-slide-down">
+          <span className="text-[#34d399] mt-0.5">
             {txStatus.includes("on-chain") ? <CheckIcon /> : <SpinnerIcon />}
           </span>
-          <span className="text-sm text-[#34d399]/90">{txStatus}</span>
+          <div className="flex flex-col gap-1">
+            <span className="text-sm text-[#34d399]/90">{txStatus}</span>
+            {txHash && (
+              <a
+                href={`https://stellar.expert/explorer/testnet/tx/${txHash}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-[#34d399]/50 hover:text-[#34d399]/80 underline underline-offset-2 transition-colors font-mono"
+              >
+                View on Stellar Expert →
+              </a>
+            )}
+          </div>
         </div>
       )}
 

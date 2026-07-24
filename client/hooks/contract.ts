@@ -177,7 +177,7 @@ export async function callContract(
     throw new Error("Transaction failed on chain.");
   }
 
-  return getResult;
+  return { ...getResult, txHash: result.hash };
 }
 
 /**
@@ -247,8 +247,8 @@ export async function submitScore(
   user: string,
   score: number,
   evaluator: string
-) {
-  return callContract(
+): Promise<string> {
+  const res = await callContract(
     "submit_score",
     [
       toScValAddress(user),
@@ -257,7 +257,8 @@ export async function submitScore(
     ],
     caller,
     true
-  );
+  ) as { txHash: string };
+  return res.txHash;
 }
 
 /**
