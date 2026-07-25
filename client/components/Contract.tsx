@@ -239,6 +239,20 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
   const [copiedAddr, setCopiedAddr] = useState<string | null>(null);
   const [shareToast, setShareToast] = useState(false);
 
+  // 3D tilt state
+  const cardRef = useRef<HTMLDivElement>(null);
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const el = cardRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
+    const y = -((e.clientY - rect.top) / rect.height - 0.5) * 2;
+    el.style.transform = `perspective(1200px) rotateX(${y * 4}deg) rotateY(${x * 4}deg) scale3d(1.01,1.01,1.01)`;
+  }, []);
+  const handleMouseLeave = useCallback(() => {
+    if (cardRef.current) cardRef.current.style.transform = "perspective(1200px) rotateX(0deg) rotateY(0deg) scale3d(1,1,1)";
+  }, []);
+
   // Submit form state
   const [submitUser, setSubmitUser] = useState("");
   const [submitScoreValue, setSubmitScoreValue] = useState("");
@@ -435,8 +449,14 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
         </div>
       )}
 
-      {/* Main Card */}
-      <Spotlight className="rounded-2xl">
+      {/* Main Card — 3D tilt */}
+      <div
+        ref={cardRef}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        style={{ transition: "transform 0.15s ease-out", transformStyle: "preserve-3d", willChange: "transform" }}
+        className="rounded-2xl"
+      >
         <AnimatedCard className="p-0" containerClassName="rounded-2xl">
           {/* Header */}
           <div className="flex items-center justify-between border-b border-white/[0.06] px-6 py-4">
@@ -796,10 +816,19 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
                                     <CopyIcon copied={copiedAddr === entry.evaluator} />
                                   </button>
                                 </div>
-                                <div className="text-[9px] text-white/25 mt-0.5">
-                                  {entry.timestamp
-                                    ? formatTimestamp(entry.timestamp)
-                                    : `Evaluator #${i + 1}`}
+                                <div className="flex items-center gap-2 mt-0.5">
+                                  <span className="text-[9px] text-white/25">
+                                    {entry.timestamp ? formatTimestamp(entry.timestamp) : `Evaluator #${i + 1}`}
+                                  </span>
+                                  <a
+                                    href={`https://stellar.expert/explorer/testnet/account/${entry.evaluator}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-[9px] text-[#4fc3f7]/40 hover:text-[#4fc3f7]/80 transition-colors underline underline-offset-2"
+                                    title="View on Stellar Expert"
+                                  >
+                                    Stellar Expert →
+                                  </a>
                                 </div>
                               </div>
                             </div>
@@ -830,7 +859,7 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
             </div>
           </div>
         </AnimatedCard>
-      </Spotlight>
+      </div>
     </div>
   );
 }

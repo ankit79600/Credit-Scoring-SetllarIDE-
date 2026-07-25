@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Meteors } from "@/components/ui/meteors";
+import dynamic from "next/dynamic";
 import Navbar from "@/components/Navbar";
 import ContractUI from "@/components/Contract";
 import OnboardingModal, { useOnboarding } from "@/components/OnboardingModal";
@@ -12,6 +12,8 @@ import {
   checkConnection,
 } from "@/hooks/contract";
 import { trackWalletConnect, trackWalletDisconnect } from "@/lib/posthog";
+
+const ParticleBackground = dynamic(() => import("@/components/ParticleBackground"), { ssr: false });
 
 export default function Home() {
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
@@ -53,16 +55,8 @@ export default function Home() {
 
   return (
     <div className="relative flex flex-col min-h-screen bg-[#050510] overflow-hidden">
-      {/* Meteors */}
-      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
-        <Meteors number={12} />
-      </div>
-
-      {/* Ambient orbs */}
-      <div className="pointer-events-none fixed inset-0 z-0">
-        <div className="absolute top-[-20%] left-[-10%] h-[600px] w-[600px] rounded-full bg-[#7c6cf0]/20 blur-[120px] animate-float" />
-        <div className="absolute bottom-[-10%] right-[-5%] h-[500px] w-[500px] rounded-full bg-[#4fc3f7]/15 blur-[120px] animate-float-delayed" />
-      </div>
+      {/* 3D Particle Network */}
+      {mounted && <ParticleBackground />}
 
       {/* Navbar */}
       <Navbar
@@ -157,7 +151,7 @@ export default function Home() {
         </div>
       </main>
 
-      {/* Onboarding Modal — shown on first visit */}
+      {/* Onboarding Modal */}
       {mounted && showOnboarding && (
         <OnboardingModal
           onComplete={completeOnboarding}
