@@ -2,6 +2,8 @@
 
 🌐 **Live Demo:** [https://my-credit-scoring-1.vercel.app](https://my-credit-scoring-1.vercel.app)
 
+📋 **User Feedback Form:** [Fill out on Google Forms](https://forms.gle/6hdSkpKgnYBqzp7J6) | [View Responses (10+)](https://docs.google.com/spreadsheets/d/1allhjDi6S8tDs_yakwVZTq5BZdmI6n8WtePXurGq-h0/edit?usp=sharing)
+
 > A fully decentralized, permissionless credit scoring system built on **Soroban smart contracts** on the **Stellar blockchain**. Any wallet can rate any other wallet (0–1000), scores are averaged on-chain, and a score is only considered "trusted" once 3+ independent evaluators agree.
 
 ---
@@ -246,15 +248,10 @@ A persistent **floating feedback button** appears in the bottom-right corner. Us
 
 Responses are tracked as `feedback_submitted` events in PostHog. After submitting, the form dismisses and a thank-you message is shown. The form only appears once per browser session (persisted in `localStorage`).
 
-### Sample Feedback Summary
+### Collected Feedback (10+ responses)
 
-| Rating | Count | Common Themes |
-|---|---|---|
-| ⭐⭐⭐⭐⭐ Excellent | — | Fast, easy to use, clean UI |
-| ⭐⭐⭐⭐ Great | — | Would love mobile app |
-| ⭐⭐⭐ Good | — | Need more documentation |
-
-> *Update with real feedback after collecting from users*
+- 📝 **Feedback Form:** [forms.gle/6hdSkpKgnYBqzp7J6](https://forms.gle/6hdSkpKgnYBqzp7J6)
+- 📊 **All Responses:** [View on Google Sheets](https://docs.google.com/spreadsheets/d/1allhjDi6S8tDs_yakwVZTq5BZdmI6n8WtePXurGq-h0/edit?usp=sharing)
 
 ---
 
