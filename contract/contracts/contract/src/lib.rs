@@ -127,6 +127,19 @@ impl Contract {
         max
     }
 
+    /// Check whether a specific evaluator has already submitted a score for a user.
+    pub fn has_evaluator(env: Env, user: Address, evaluator: Address) -> bool {
+        let scores = Self::get_scores(env, user);
+        for i in 0..scores.len() {
+            if let Some(entry) = scores.get(i) {
+                if entry.evaluator == evaluator {
+                    return true;
+                }
+            }
+        }
+        false
+    }
+
     /// Returns the average score only if at least min_evaluators have submitted.
     /// Returns 0 if the threshold is not met (prevents single-evaluator gaming).
     pub fn get_average_score_if_threshold(env: Env, user: Address, min_evaluators: u32) -> u32 {
