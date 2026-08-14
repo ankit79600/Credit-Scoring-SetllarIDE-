@@ -299,6 +299,34 @@ export async function getAverageScore(user: string, caller?: string) {
 }
 
 /**
+ * Get the lowest score submitted for a user (read-only).
+ * Calls: get_min_score(user: Address) -> u32
+ */
+export async function getMinScore(user: string, caller?: string) {
+  return readContract("get_min_score", [toScValAddress(user)], caller);
+}
+
+/**
+ * Get the highest score submitted for a user (read-only).
+ * Calls: get_max_score(user: Address) -> u32
+ */
+export async function getMaxScore(user: string, caller?: string) {
+  return readContract("get_max_score", [toScValAddress(user)], caller);
+}
+
+/**
+ * Check whether a specific evaluator has submitted a score for a user (read-only).
+ * Calls: has_evaluator(user: Address, evaluator: Address) -> bool
+ */
+export async function hasEvaluator(user: string, evaluator: string, caller?: string) {
+  return readContract(
+    "has_evaluator",
+    [toScValAddress(user), toScValAddress(evaluator)],
+    caller
+  );
+}
+
+/**
  * Returns the average score only if at least minEvaluators have submitted.
  * Returns 0 if the threshold is not met.
  * Calls: get_average_score_if_threshold(user: Address, min_evaluators: u32) -> u32
