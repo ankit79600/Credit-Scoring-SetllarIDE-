@@ -575,6 +575,15 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
                       <ShareIcon /> Share
                     </button>
                   )}
+                  {lookupData && (
+                    <button
+                      onClick={() => { setLookupData(null); setLookupUser(""); setError(null); const url = new URL(window.location.href); url.searchParams.delete("user"); window.history.replaceState({}, "", url.toString()); }}
+                      className="flex items-center gap-1.5 rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-xs text-white/30 hover:text-white/60 hover:border-white/[0.10] transition-all"
+                      title="Clear results"
+                    >
+                      &times;
+                    </button>
+                  )}
                 </div>
 
                 {lookupData && (
@@ -872,9 +881,20 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
                     ) : undefined
                   }
                 />
-                <ShimmerButton onClick={handleGetHistory} disabled={isGettingHistory} shimmerColor="#fbbf24" className="w-full">
-                  {isGettingHistory ? <><SpinnerIcon /> Fetching...</> : <><ChartIcon /> Get Full History</>}
-                </ShimmerButton>
+                <div className="flex gap-2">
+                  <ShimmerButton onClick={handleGetHistory} disabled={isGettingHistory} shimmerColor="#fbbf24" className="flex-1">
+                    {isGettingHistory ? <><SpinnerIcon /> Fetching...</> : <><ChartIcon /> Get Full History</>}
+                  </ShimmerButton>
+                  {historyData && (
+                    <button
+                      onClick={() => { setHistoryData(null); setHistoryUser(""); setError(null); }}
+                      className="flex items-center gap-1.5 rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-xs text-white/30 hover:text-white/60 hover:border-white/[0.10] transition-all"
+                      title="Clear results"
+                    >
+                      &times;
+                    </button>
+                  )}
+                </div>
 
                 {historyData && (
                   <div className="space-y-3 animate-fade-in-up">
