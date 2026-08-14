@@ -15,9 +15,24 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Credit Score on Stellar",
+  title: "Credit Scoring System — Stellar Soroban",
   description:
-    "Submit, track, and verify credit scores immutably on Stellar with Soroban smart contracts.",
+    "Submit, track, and verify credit scores immutably on Stellar with Soroban smart contracts. Decentralized, permissionless, and transparent.",
+  keywords: ["credit score", "Stellar", "Soroban", "blockchain", "DeFi", "smart contract"],
+  openGraph: {
+    title: "Credit Scoring System — Stellar Soroban",
+    description:
+      "Decentralized credit scoring on Stellar. Submit and verify scores on-chain with Soroban smart contracts.",
+    type: "website",
+    url: "https://my-credit-scoring-1.vercel.app",
+    siteName: "Credit Scoring System",
+  },
+  twitter: {
+    card: "summary",
+    title: "Credit Scoring System — Stellar Soroban",
+    description:
+      "Decentralized credit scoring on Stellar. Submit and verify scores on-chain with Soroban smart contracts.",
+  },
 };
 
 export default function RootLayout({
