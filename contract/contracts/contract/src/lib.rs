@@ -93,6 +93,40 @@ impl Contract {
         (total / scores.len() as u64) as u32
     }
 
+    /// Get the lowest score submitted for a user. Returns 0 if no scores exist.
+    pub fn get_min_score(env: Env, user: Address) -> u32 {
+        let scores = Self::get_scores(env, user);
+        if scores.is_empty() {
+            return 0;
+        }
+        let mut min = u32::MAX;
+        for i in 0..scores.len() {
+            if let Some(entry) = scores.get(i) {
+                if entry.score < min {
+                    min = entry.score;
+                }
+            }
+        }
+        min
+    }
+
+    /// Get the highest score submitted for a user. Returns 0 if no scores exist.
+    pub fn get_max_score(env: Env, user: Address) -> u32 {
+        let scores = Self::get_scores(env, user);
+        if scores.is_empty() {
+            return 0;
+        }
+        let mut max = 0u32;
+        for i in 0..scores.len() {
+            if let Some(entry) = scores.get(i) {
+                if entry.score > max {
+                    max = entry.score;
+                }
+            }
+        }
+        max
+    }
+
     /// Returns the average score only if at least min_evaluators have submitted.
     /// Returns 0 if the threshold is not met (prevents single-evaluator gaming).
     pub fn get_average_score_if_threshold(env: Env, user: Address, min_evaluators: u32) -> u32 {
