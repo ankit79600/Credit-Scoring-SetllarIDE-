@@ -646,10 +646,16 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
                     {lookupData.evaluatorCount > 0 && !meetsThreshold && (
                       <div className="flex items-start gap-3 rounded-xl border border-[#fbbf24]/15 bg-[#fbbf24]/[0.03] px-4 py-3 text-xs text-white/40">
                         <span className="text-[#fbbf24] mt-0.5"><AlertIcon /></span>
-                        <span>
-                          <span className="font-semibold text-[#fbbf24]/70">Low confidence:</span>{" "}
-                          Only {lookupData.evaluatorCount} evaluator{lookupData.evaluatorCount !== 1 ? "s" : ""} — at least 3 needed for a trusted score.
-                        </span>
+                        <div className="space-y-1">
+                          <span>
+                            <span className="font-semibold text-[#fbbf24]/70">Low confidence:</span>{" "}
+                            Only {lookupData.evaluatorCount} evaluator{lookupData.evaluatorCount !== 1 ? "s" : ""} — at least 3 needed for a trusted score.
+                          </span>
+                          <p className="text-[10px] text-white/25 leading-relaxed">
+                            The 3-evaluator threshold prevents a single party from gaming the score.
+                            The average is shown but marked as unverified until the minimum is met.
+                          </p>
+                        </div>
                       </div>
                     )}
 
