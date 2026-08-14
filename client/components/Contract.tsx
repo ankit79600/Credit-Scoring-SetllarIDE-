@@ -517,6 +517,7 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
                   label="User Address"
                   value={lookupUser}
                   onChange={(e) => setLookupUser(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleLookup()}
                   placeholder="G..."
                   hint={
                     walletAddress ? (
@@ -770,6 +771,7 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
                   label="User Address"
                   value={historyUser}
                   onChange={(e) => setHistoryUser(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleGetHistory()}
                   placeholder="G..."
                   hint={
                     walletAddress ? (
