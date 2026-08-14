@@ -106,20 +106,42 @@ function ShareIcon() {
 
 // ── Styled Input ─────────────────────────────────────────────
 
+function isValidStellarAddress(addr: string): boolean {
+  return addr.length === 56 && addr.startsWith("G");
+}
+
 function Input({
   label,
   hint,
+  validateAddress,
   ...props
-}: { label: string; hint?: React.ReactNode } & React.InputHTMLAttributes<HTMLInputElement>) {
+}: { label: string; hint?: React.ReactNode; validateAddress?: boolean } & React.InputHTMLAttributes<HTMLInputElement>) {
+  const val = (props.value as string) ?? "";
+  const showValidation = validateAddress && val.length > 0;
+  const valid = showValidation && isValidStellarAddress(val);
+  const invalid = showValidation && !isValidStellarAddress(val);
+
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
         <label className="block text-[11px] font-medium uppercase tracking-wider text-white/30">
           {label}
         </label>
-        {hint}
+        <div className="flex items-center gap-2">
+          {showValidation && (
+            <span className={cn("text-[10px] font-mono", valid ? "text-[#34d399]/70" : "text-[#f87171]/60")}>
+              {valid ? "valid address" : `${val.length}/56`}
+            </span>
+          )}
+          {hint}
+        </div>
       </div>
-      <div className="group rounded-xl border border-white/[0.06] bg-white/[0.02] p-px transition-all focus-within:border-[#7c6cf0]/30 focus-within:shadow-[0_0_20px_rgba(124,108,240,0.08)]">
+      <div className={cn(
+        "group rounded-xl border bg-white/[0.02] p-px transition-all",
+        valid ? "border-[#34d399]/25 shadow-[0_0_20px_rgba(52,211,153,0.06)]" :
+        invalid ? "border-[#f87171]/20" :
+        "border-white/[0.06] focus-within:border-[#7c6cf0]/30 focus-within:shadow-[0_0_20px_rgba(124,108,240,0.08)]"
+      )}>
         <input
           {...props}
           className="w-full rounded-[11px] bg-transparent px-4 py-3 font-mono text-sm text-white/90 placeholder:text-white/15 outline-none"
@@ -519,6 +541,7 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
                   onChange={(e) => setLookupUser(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleLookup()}
                   placeholder="G..."
+                  validateAddress
                   hint={
                     walletAddress ? (
                       <button
@@ -670,6 +693,7 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
                   value={submitUser}
                   onChange={(e) => setSubmitUser(e.target.value)}
                   placeholder="G... (the person being rated)"
+                  validateAddress
                 />
                 <Input
                   label="Score (0-1000)"
@@ -773,6 +797,7 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
                   onChange={(e) => setHistoryUser(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleGetHistory()}
                   placeholder="G..."
+                  validateAddress
                   hint={
                     walletAddress ? (
                       <button
