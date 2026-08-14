@@ -654,6 +654,43 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
                       </div>
                     )}
 
+                    {/* Score category breakdown */}
+                    {lookupData.scores.length > 1 && (() => {
+                      const bands = [
+                        { label: "Excellent", min: 800, color: "bg-[#34d399]", text: "text-[#34d399]" },
+                        { label: "Good", min: 700, color: "bg-[#4fc3f7]", text: "text-[#4fc3f7]" },
+                        { label: "Fair", min: 600, color: "bg-[#fbbf24]", text: "text-[#fbbf24]" },
+                        { label: "Poor", min: 400, color: "bg-[#fb923c]", text: "text-[#fb923c]" },
+                        { label: "Very Poor", min: 0, color: "bg-[#f87171]", text: "text-[#f87171]" },
+                      ];
+                      const counts = bands.map((b, i) => ({
+                        ...b,
+                        count: lookupData.scores.filter((e) =>
+                          e.score >= b.min && (i === 0 || e.score < bands[i - 1].min)
+                        ).length,
+                      })).filter((b) => b.count > 0);
+                      if (counts.length <= 1) return null;
+                      return (
+                        <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+                          <span className="text-[10px] font-medium uppercase tracking-wider text-white/25 block mb-3">Rating Breakdown</span>
+                          <div className="space-y-2">
+                            {counts.map((b) => (
+                              <div key={b.label} className="flex items-center gap-3">
+                                <span className="text-[10px] text-white/35 w-16 shrink-0">{b.label}</span>
+                                <div className="flex-1 h-1.5 rounded-full bg-white/[0.04] overflow-hidden">
+                                  <div
+                                    className={cn("h-full rounded-full", b.color)}
+                                    style={{ width: `${(b.count / lookupData.scores.length) * 100}%` }}
+                                  />
+                                </div>
+                                <span className={cn("text-[10px] font-mono w-4 text-right shrink-0", b.text)}>{b.count}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })()}
+
                     {/* Bar chart */}
                     {lookupData.scores.length > 0 && (
                       <ScoreBarChart scores={lookupData.scores} />
