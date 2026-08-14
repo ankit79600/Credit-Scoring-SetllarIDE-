@@ -429,6 +429,32 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
     setTimeout(() => setShareToast(false), 2000);
   }, [lookupUser, copyToClipboard]);
 
+  // ── Copy score report as text ─────────────────────────────
+
+  const handleCopyReport = useCallback(async () => {
+    if (!lookupData) return;
+    const lines = [
+      `Credit Score Report — ${lookupUser}`,
+      `Generated: ${new Date().toUTCString()}`,
+      ``,
+      `Average Score : ${lookupData.averageScore} / 1000 (${getScoreConfig(lookupData.averageScore).label})`,
+      `Evaluators    : ${lookupData.evaluatorCount}`,
+      lookupData.evaluatorCount > 1
+        ? `Range         : ${lookupData.minScore} – ${lookupData.maxScore}`
+        : "",
+      ``,
+      `Individual Scores:`,
+      ...lookupData.scores.map((e, i) =>
+        `  ${i + 1}. ${e.evaluator}  →  ${e.score}  (${getScoreConfig(e.score).label})`
+      ),
+      ``,
+      `Verified on Stellar Soroban testnet`,
+    ].filter((l) => l !== undefined);
+    await copyToClipboard(lines.join("\n"));
+    setShareToast(true);
+    setTimeout(() => setShareToast(false), 2000);
+  }, [lookupData, lookupUser, copyToClipboard]);
+
   const tabs: { key: Tab; label: string; icon: React.ReactNode; color: string }[] = [
     { key: "lookup", label: "Lookup", icon: <SearchIcon />, color: "#4fc3f7" },
     { key: "submit", label: "Submit", icon: <StarIcon />, color: "#7c6cf0" },
@@ -710,7 +736,16 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
                       <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] overflow-hidden">
                         <div className="border-b border-white/[0.06] px-4 py-3 flex items-center justify-between">
                           <span className="text-[10px] font-medium uppercase tracking-wider text-white/25">Score Entries</span>
-                          <span className="text-[10px] text-white/25 font-mono">{lookupData.scores.length} total</span>
+                          <div className="flex items-center gap-3">
+                            <button
+                              onClick={handleCopyReport}
+                              className="flex items-center gap-1 text-[10px] text-white/25 hover:text-white/60 transition-colors"
+                              title="Copy full score report"
+                            >
+                              <CopyIcon /> Copy Report
+                            </button>
+                            <span className="text-[10px] text-white/25 font-mono">{lookupData.scores.length} total</span>
+                          </div>
                         </div>
                         <div className="p-2 space-y-2">
                           {lookupData.scores.map((entry, i) => {
