@@ -6,6 +6,8 @@ import {
   getScores,
   getEvaluatorCount,
   getAverageScore,
+  getMinScore,
+  getMaxScore,
   CONTRACT_ADDRESS,
 } from "@/hooks/contract";
 import { trackContractInteraction } from "@/lib/posthog";
@@ -287,6 +289,8 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
   const [lookupData, setLookupData] = useState<{
     evaluatorCount: number;
     averageScore: number;
+    minScore: number;
+    maxScore: number;
     scores: ScoreEntry[];
   } | null>(null);
 
@@ -321,14 +325,18 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
     setIsLookingUp(true);
     setLookupData(null);
     try {
-      const [countResult, avgResult, scoresResult] = await Promise.all([
+      const [countResult, avgResult, scoresResult, minResult, maxResult] = await Promise.all([
         getEvaluatorCount(address, walletAddress || undefined),
         getAverageScore(address, walletAddress || undefined),
         getScores(address, walletAddress || undefined),
+        getMinScore(address, walletAddress || undefined),
+        getMaxScore(address, walletAddress || undefined),
       ]);
       setLookupData({
         evaluatorCount: countResult ?? 0,
         averageScore: avgResult ?? 0,
+        minScore: minResult ?? 0,
+        maxScore: maxResult ?? 0,
         scores: (scoresResult ?? []) as ScoreEntry[],
       });
       trackContractInteraction("lookup_score", { evaluator_count: countResult ?? 0 });
@@ -604,6 +612,24 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
                         })()}
                       </div>
                     </div>
+
+                    {/* Score Spread */}
+                    {lookupData.evaluatorCount > 1 && (
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-3 text-center">
+                          <div className={cn("text-lg font-bold font-mono", getScoreConfig(lookupData.minScore).color)}>
+                            {lookupData.minScore}
+                          </div>
+                          <div className="text-[10px] text-white/25 mt-0.5 uppercase tracking-wider">Lowest</div>
+                        </div>
+                        <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-3 text-center">
+                          <div className={cn("text-lg font-bold font-mono", getScoreConfig(lookupData.maxScore).color)}>
+                            {lookupData.maxScore}
+                          </div>
+                          <div className="text-[10px] text-white/25 mt-0.5 uppercase tracking-wider">Highest</div>
+                        </div>
+                      </div>
+                    )}
 
                     {/* Score progress bar */}
                     {lookupData.averageScore > 0 && (
