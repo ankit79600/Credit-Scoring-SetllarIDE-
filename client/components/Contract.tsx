@@ -190,6 +190,16 @@ function getScoreConfig(score: number): { color: string; bg: string; label: stri
 
 // ── Utilities ────────────────────────────────────────────────
 
+function getScorePercentile(score: number): string {
+  if (score >= 950) return "Top 5%";
+  if (score >= 850) return "Top 15%";
+  if (score >= 750) return "Top 30%";
+  if (score >= 650) return "Top 50%";
+  if (score >= 500) return "Top 65%";
+  if (score >= 350) return "Bottom 35%";
+  return "Bottom 15%";
+}
+
 function formatTimestamp(ts: number | bigint | undefined): string {
   if (!ts) return "—";
   return new Date(Number(ts) * 1000).toLocaleDateString("en-US", {
@@ -705,9 +715,14 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
                       <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
                         <div className="flex items-center justify-between mb-3">
                           <span className="text-[10px] font-medium uppercase tracking-wider text-white/25">Score Position</span>
-                          <span className={cn("text-[10px] font-mono font-semibold", meetsThreshold ? getScoreConfig(lookupData.averageScore).color : "text-white/30")}>
-                            {lookupData.averageScore} / 1000
-                          </span>
+                          <div className="flex items-center gap-2">
+                            {meetsThreshold && (
+                              <span className="text-[10px] text-white/25">{getScorePercentile(lookupData.averageScore)}</span>
+                            )}
+                            <span className={cn("text-[10px] font-mono font-semibold", meetsThreshold ? getScoreConfig(lookupData.averageScore).color : "text-white/30")}>
+                              {lookupData.averageScore} / 1000
+                            </span>
+                          </div>
                         </div>
                         <div className="relative h-2.5 rounded-full bg-white/[0.04] overflow-hidden">
                           <div
