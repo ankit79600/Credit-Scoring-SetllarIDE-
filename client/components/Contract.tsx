@@ -568,6 +568,14 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
             {activeTab === "lookup" && (
               <div className="space-y-5">
                 <MethodSignature name="get_evaluator_count / get_average_score" params="(user: Address)" returns="-> u32" color="#4fc3f7" />
+                {!walletAddress && (
+                  <div className="flex items-center gap-2 rounded-xl border border-[#4fc3f7]/10 bg-[#4fc3f7]/[0.03] px-4 py-2.5 text-xs text-[#4fc3f7]/50">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+                    </svg>
+                    No wallet needed — lookups are read-only and free
+                  </div>
+                )}
 
                 <Input
                   label="User Address"
