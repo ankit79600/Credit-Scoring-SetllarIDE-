@@ -461,6 +461,22 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
     { key: "history", label: "History", icon: <ChartIcon />, color: "#fbbf24" },
   ];
 
+  const handleTabKeyDown = useCallback((e: React.KeyboardEvent, currentKey: Tab) => {
+    const order: Tab[] = ["lookup", "submit", "history"];
+    const idx = order.indexOf(currentKey);
+    if (e.key === "ArrowRight") {
+      e.preventDefault();
+      const next = order[(idx + 1) % order.length];
+      setActiveTab(next);
+      setError(null);
+    } else if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      const prev = order[(idx - 1 + order.length) % order.length];
+      setActiveTab(prev);
+      setError(null);
+    }
+  }, []);
+
   const meetsThreshold = lookupData ? lookupData.evaluatorCount >= 3 : false;
 
   return (
@@ -544,7 +560,11 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
             {tabs.map((t) => (
               <button
                 key={t.key}
+                role="tab"
+                aria-selected={activeTab === t.key}
+                tabIndex={activeTab === t.key ? 0 : -1}
                 onClick={() => { setActiveTab(t.key); setError(null); setLookupData(null); setHistoryData(null); }}
+                onKeyDown={(e) => handleTabKeyDown(e, t.key)}
                 className={cn(
                   "relative flex items-center gap-2 px-5 py-3.5 text-sm font-medium transition-all",
                   activeTab === t.key ? "text-white/90" : "text-white/35 hover:text-white/55"
