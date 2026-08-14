@@ -127,6 +127,29 @@ impl Contract {
         max
     }
 
+    /// Remove an evaluator's score for a user. Only the evaluator themselves can remove their score.
+    pub fn remove_score(env: Env, user: Address, evaluator: Address) {
+        evaluator.require_auth();
+        let key = DataKey::Scores(user.clone());
+        let mut scores: Vec<ScoreEntry> = env
+            .storage()
+            .instance()
+            .get(&key)
+            .unwrap_or_else(|| Vec::new(&env));
+
+        let mut new_scores: Vec<ScoreEntry> = Vec::new(&env);
+        for i in 0..scores.len() {
+            if let Some(entry) = scores.get(i) {
+                if entry.evaluator != evaluator {
+                    new_scores.push_back(entry);
+                }
+            }
+        }
+        scores = new_scores;
+        env.storage().instance().set(&key, &scores);
+        env.storage().instance().extend_ttl(518_400, 1_555_200);
+    }
+
     /// Check whether a specific evaluator has already submitted a score for a user.
     pub fn has_evaluator(env: Env, user: Address, evaluator: Address) -> bool {
         let scores = Self::get_scores(env, user);
