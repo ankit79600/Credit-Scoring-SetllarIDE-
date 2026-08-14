@@ -149,6 +149,71 @@ fn test_threshold_met() {
 }
 
 #[test]
+fn test_get_min_max_score() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let contract_id = env.register(Contract, ());
+    let client = ContractClient::new(&env, &contract_id);
+
+    let user = Address::generate(&env);
+    let e1 = Address::generate(&env);
+    let e2 = Address::generate(&env);
+    let e3 = Address::generate(&env);
+
+    // No scores yet
+    assert_eq!(client.get_min_score(&user), 0);
+    assert_eq!(client.get_max_score(&user), 0);
+
+    client.submit_score(&user, &400, &e1);
+    client.submit_score(&user, &750, &e2);
+    client.submit_score(&user, &900, &e3);
+
+    assert_eq!(client.get_min_score(&user), 400);
+    assert_eq!(client.get_max_score(&user), 900);
+}
+
+#[test]
+fn test_has_evaluator() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let contract_id = env.register(Contract, ());
+    let client = ContractClient::new(&env, &contract_id);
+
+    let user = Address::generate(&env);
+    let evaluator = Address::generate(&env);
+    let other = Address::generate(&env);
+
+    assert!(!client.has_evaluator(&user, &evaluator));
+
+    client.submit_score(&user, &700, &evaluator);
+
+    assert!(client.has_evaluator(&user, &evaluator));
+    assert!(!client.has_evaluator(&user, &other));
+}
+
+#[test]
+fn test_remove_score() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let contract_id = env.register(Contract, ());
+    let client = ContractClient::new(&env, &contract_id);
+
+    let user = Address::generate(&env);
+    let e1 = Address::generate(&env);
+    let e2 = Address::generate(&env);
+
+    client.submit_score(&user, &700, &e1);
+    client.submit_score(&user, &900, &e2);
+    assert_eq!(client.get_evaluator_count(&user), 2);
+
+    client.remove_score(&user, &e1);
+    assert_eq!(client.get_evaluator_count(&user), 1);
+    assert!(!client.has_evaluator(&user, &e1));
+    assert!(client.has_evaluator(&user, &e2));
+    assert_eq!(client.get_average_score(&user), 900);
+}
+
+#[test]
 fn test_timestamp_recorded() {
     let env = Env::default();
     env.mock_all_auths();
