@@ -758,6 +758,8 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
                         <div className="p-2 space-y-2">
                           {lookupData.scores.map((entry, i) => {
                             const cfg = getScoreConfig(entry.score);
+                            const isSelf = walletAddress && entry.evaluator === walletAddress;
+                            const isSelfScored = walletAddress && entry.evaluator === lookupUser;
                             return (
                               <div key={i} className="flex items-center justify-between rounded-lg px-3 py-2 border border-white/[0.04] bg-white/[0.01]">
                                 <div className="flex flex-col gap-0.5">
@@ -770,6 +772,12 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
                                     >
                                       <CopyIcon copied={copiedAddr === entry.evaluator} />
                                     </button>
+                                    {isSelf && (
+                                      <span className="text-[8px] rounded-full border border-[#7c6cf0]/30 bg-[#7c6cf0]/10 px-1.5 py-0.5 text-[#7c6cf0]/70 font-medium">You</span>
+                                    )}
+                                    {isSelfScored && (
+                                      <span className="text-[8px] rounded-full border border-[#fbbf24]/30 bg-[#fbbf24]/10 px-1.5 py-0.5 text-[#fbbf24]/70 font-medium">Self</span>
+                                    )}
                                   </div>
                                   {entry.timestamp ? (
                                     <span className="text-[9px] text-white/25">{formatTimestamp(entry.timestamp)}</span>
