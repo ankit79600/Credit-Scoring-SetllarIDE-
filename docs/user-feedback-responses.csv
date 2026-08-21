@@ -1,4 +1,4 @@
-Timestamp,Name,Email,Wallet Address,Rating (1-5),Feedback Comments
+Timestamp,Name,Email,Stellar Public Address,Transaction Hash / Proof of Interaction,How easy was it to connect your wallet and use the app?,Suggestions for Improvement
 2026-07-14 09:12:43,Ankit Patel,ankitpatel79600@gmail.com,GATKS6ZEKEY6CSBARSZDEX5KI3IR5SJCKJUVEHIHT5BOK73FZMPP7D4T,5,Very impressive dApp! Loved how easy it was to submit a score.
 2026-07-14 10:23:11,Rahul Sharma,rahul.sharma92@gmail.com,GBMY4XNZRR2DMGVKKSXV7UVKUEZGZAPF7BNAQR3FKH5LNPEXMW7UCG,5,Smooth experience overall. The onboarding modal is really helpful for beginners.
 2026-07-14 11:45:22,Priya Singh,priya.singh.dev@gmail.com,GAS3QKZRLWV5SMJKTEWQ7PXYVXP5HKBMCF8YJXNMGQT6EPHNYKFID2,4,Great concept! Would love a way to export my score as a PDF too.

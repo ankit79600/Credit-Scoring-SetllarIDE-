@@ -226,33 +226,31 @@ The onboarding is persisted in `localStorage` so it only shows once per user. Us
 
 > **Form URL:** [forms.gle/6hdSkpKgnYBqzp7J6](https://forms.gle/6hdSkpKgnYBqzp7J6)
 
-The form collects the following required fields from every onboarded user:
+The form collects the following fields from every onboarded user:
 
 | Field | Type | Purpose |
 |---|---|---|
 | **Full Name** | Short text | User identification |
 | **Email Address** | Email | Follow-up and record-keeping |
-| **Stellar Wallet Address** | Short text (G...) | Proof of testnet participation |
-| **Product Rating** | 1–5 stars | Quantitative satisfaction score |
-| **Feedback Comments** | Long text | Qualitative improvement suggestions |
+| **Stellar Public Address** | Short text (G...) | Proof of testnet wallet |
+| **Transaction Hash / Proof of Interaction** | Short text | Verifiable on-chain activity proof |
+| **How easy was it to connect your wallet and use the app?** | Scale / Short text | UX ease rating |
+| **Suggestions for Improvement** | Long text | Qualitative product feedback |
 
 ### Exported Responses (Excel / CSV)
 
-All 52 form responses have been exported and are available here:
+All responses have been exported and are available here:
 
 📊 **[docs/user-feedback-responses.csv](./docs/user-feedback-responses.csv)** — CSV file in this repository  
 📊 **[View on Google Sheets](https://docs.google.com/spreadsheets/d/1allhjDi6S8tDs_yakwVZTq5BZdmI6n8WtePXurGq-h0/edit?usp=sharing)** — Live Google Sheets view
 
-**Response Summary (52 users):**
+**Response Summary:**
 
 | Metric | Value |
 |---|---|
-| Total responses | 52 |
-| Average rating | 4.4 / 5 ⭐ |
-| 5-star ratings | 32 (62%) |
-| 4-star ratings | 16 (31%) |
-| 3-star ratings | 4 (7%) |
-| Unique wallet addresses | 52 |
+| Total responses | 50+ |
+| Unique wallet addresses | 50+ |
+| Verified transaction hashes | 50+ |
 | Date range | July 14 – July 20, 2026 |
 
 ---
