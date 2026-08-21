@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { trackOnboardingStep } from "@/lib/posthog";
 
-const STORAGE_KEY = "credit_scoring_onboarded_v1";
+const STORAGE_KEY = "credit_scoring_onboarded_v2";
 
 const STEPS = [
   {
@@ -69,6 +69,26 @@ const STEPS = [
     description:
       "Use the Lookup tab to check any address's credit score. Use the Submit tab to rate any wallet (0–1000). Scores are stored forever on-chain.",
     tip: "A score only becomes \"trusted\" once 3+ independent evaluators have rated the same address.",
+  },
+  {
+    step: 5,
+    icon: (
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+      </svg>
+    ),
+    color: "#fb923c",
+    title: "Share Feedback & Invite Others",
+    description:
+      "Help improve the app by sharing your experience. You can also invite others — the more evaluators rate a wallet, the more trusted the score becomes.",
+    action: {
+      label: "Share Feedback",
+      href: "https://forms.gle/6hdSkpKgnYBqzp7J6",
+    },
+    tip: "Use the floating feedback button (bottom-right) anytime to rate the app or suggest features.",
   },
 ];
 
