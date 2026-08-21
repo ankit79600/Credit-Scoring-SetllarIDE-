@@ -94,6 +94,7 @@ export default function Home() {
           {/* Stats */}
           <div className="mt-6 flex items-center justify-center gap-6 sm:gap-10 animate-fade-in-up-delayed">
             {[
+              { label: "Testnet Users", value: "50+" },
               { label: "Finality", value: "~5s" },
               { label: "Cost", value: "<$0.01" },
               { label: "Network", value: "Testnet" },

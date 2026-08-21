@@ -108,7 +108,7 @@ export default function Navbar({
               Credit Scoring System
             </span>
             <span className="hidden sm:inline-block text-[10px] font-mono text-white/20 border border-white/[0.06] rounded px-1.5 py-0.5">
-              v1.0
+              v2.0
             </span>
           </div>
         </div>
