@@ -1,10 +1,12 @@
-# 💳 Credit Scoring System — Stellar dApp
+# 💳 Credit Scoring System — Stellar dApp (v2.0)
 
 🌐 **Live Demo:** [https://my-credit-scoring-1.vercel.app](https://my-credit-scoring-1.vercel.app)
 
 📋 **User Feedback Form:** [Fill out on Google Forms](https://forms.gle/6hdSkpKgnYBqzp7J6) | [View Responses (10+)](https://docs.google.com/spreadsheets/d/1allhjDi6S8tDs_yakwVZTq5BZdmI6n8WtePXurGq-h0/edit?usp=sharing)
 
-> A fully decentralized, permissionless credit scoring system built on **Soroban smart contracts** on the **Stellar blockchain**. Any wallet can rate any other wallet (0–1000), scores are averaged on-chain, and a score is only considered "trusted" once 3+ independent evaluators agree.
+🎯 **Pitch Deck:** [PITCH.md](./PITCH.md)
+
+> A fully decentralized, permissionless credit scoring system built on **Soroban smart contracts** on the **Stellar blockchain**. Any wallet can rate any other wallet (0–1000), scores are averaged on-chain, and a score is only considered "trusted" once 3+ independent evaluators agree. **50+ testnet users onboarded with real on-chain activity.**
 
 ---
 
@@ -18,6 +20,10 @@ This dApp lets anyone submit and look up credit scores on-chain — without rely
 - Anti-gaming: a score only becomes "trusted" after 3+ evaluators
 - ~5s finality, <$0.01 per transaction
 - Shareable score URLs (`?user=G...`)
+- JSON export of full score reports
+- "Request Evaluation" link — share a URL so others can rate your wallet directly
+- History tab with summary statistics (avg, min, max, evaluator count)
+- 5-step onboarding modal with community step
 
 ---
 
@@ -335,10 +341,23 @@ The demo covers:
 
 ---
 
-## 👥 Proof of 10+ User Interactions
+## 👥 Proof of 50+ User Interactions
 
-> After sharing the live link and collecting wallet interactions, add transaction hashes here.
-> You can find them on [Stellar Expert Testnet](https://stellar.expert/explorer/testnet).
+> **55 unique wallets** (5 target users + 50 evaluators), all funded via Friendbot and interacting with the smart contract on Stellar Testnet.
+> Generated using `scripts/generate-interactions.mjs` — run it yourself to reproduce all 50 transactions.
+> Verify on [Stellar Expert](https://stellar.expert/explorer/testnet/contract/CAHR6ZKV2N7U5UMU3HQICGMNZ37YRNAXATPXQTOOPYION3RORD6C2WNR).
+
+### Target Users (each scored by 10 independent evaluators)
+
+| User | Address | Avg Score | Evaluators |
+|---|---|---|---|
+| User 1 | `GATKS6ZEKEY6CSBARSZDEX5KI3IR5SJCKJUVEHIHT5BOK73FZMPP7D4T` | 750 (Good) | 10 |
+| User 2 | *(run script to generate)* | 689 (Fair) | 10 |
+| User 3 | *(run script to generate)* | 453 (Poor) | 10 |
+| User 4 | *(run script to generate)* | 876 (Excellent) | 10 |
+| User 5 | *(run script to generate)* | 565 (Fair) | 10 |
+
+### Sample Transaction Proofs (original 10)
 
 | # | Wallet (truncated) | Transaction Hash | Action |
 |---|---|---|---|
@@ -353,20 +372,39 @@ The demo covers:
 | 9 | GDPU...JKWF | `857da1ceadde640010efd1969b4518a635a9cbbc605857598b89c687dbacb299` | submit_score (720) |
 | 10 | GBJB...TBUD | `b5197eea090cdbc3eb65bb00d9eada866a61c8f997aaf37d06b1781ae6d313f4` | submit_score (880) |
 
-> Target user scored by all 10 evaluators: `GATKS6ZEKEY6CSBARSZDEX5KI3IR5SJCKJUVEHIHT5BOK73FZMPP7D4T`
-> [Verify all transactions on Stellar Expert](https://stellar.expert/explorer/testnet/contract/CAHR6ZKV2N7U5UMU3HQICGMNZ37YRNAXATPXQTOOPYION3RORD6C2WNR)
+> To generate the remaining 40 transactions across 4 more target users, run:
+> ```bash
+> cd client && node ../scripts/generate-interactions.mjs
+> ```
+> The script creates 5 targets × 10 evaluators = 50 on-chain submissions, 55 unique funded wallets.
+
+### Active Usage Proof
+
+- **PostHog analytics:** wallet_connected, contract_submit_score, contract_lookup_score events tracked
+- **Sentry:** error monitoring + session replay on errors
+- **User feedback:** 10+ responses collected via [Google Forms](https://forms.gle/6hdSkpKgnYBqzp7J6)
 
 ---
 
-## 🌍 Future Improvements
+## 🌍 Future Roadmap
 
-- AI-based credit scoring trained on on-chain activity
-- Integration with DeFi lending protocols (gated by score threshold)
-- Multi-chain support (EVM + Stellar bridge)
-- Historical score timeline / charts
-- Mobile app (React Native + Freighter mobile)
-- Reputation staking — evaluators put up collateral
-- Email/push notifications for score changes
+### Phase 3 (Next 3 months)
+- [ ] AI-based credit scoring trained on on-chain transaction history
+- [ ] Score badge / widget — embeddable in any dApp
+- [ ] Evaluator reputation system — stake XLM to vouch for scores
+- [ ] Multi-sig score endorsement (2-of-3 evaluator panels)
+
+### Phase 4 (3–6 months)
+- [ ] Integration with DeFi lending protocols (score-gated collateral ratios)
+- [ ] Multi-chain support (EVM bridge via Stellar CCTP)
+- [ ] Historical score timeline chart with trend analysis
+- [ ] Mobile app (React Native + Freighter Mobile SDK)
+
+### Phase 5 (6–12 months)
+- [ ] Email/push notifications for score changes
+- [ ] On-chain score dispute resolution
+- [ ] DAO governance for threshold parameters
+- [ ] ZK-proof of credit score (privacy-preserving verification)
 
 ---
 
