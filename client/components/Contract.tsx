@@ -106,6 +106,25 @@ function ShareIcon() {
   );
 }
 
+function DownloadIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+      <polyline points="7 10 12 15 17 10" />
+      <line x1="12" y1="15" x2="12" y2="3" />
+    </svg>
+  );
+}
+
+function LinkIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+    </svg>
+  );
+}
+
 // ── Styled Input ─────────────────────────────────────────────
 
 function isValidStellarAddress(addr: string): boolean {
@@ -465,6 +484,67 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
     setTimeout(() => setShareToast(false), 2000);
   }, [lookupData, lookupUser, copyToClipboard]);
 
+  // ── Export score data as JSON ─────────────────────────────
+
+  const handleExportJSON = useCallback(async () => {
+    if (!lookupData) return;
+    const payload = {
+      user: lookupUser,
+      generatedAt: new Date().toISOString(),
+      network: "Stellar Testnet",
+      contract: CONTRACT_ADDRESS,
+      summary: {
+        evaluatorCount: lookupData.evaluatorCount,
+        averageScore: lookupData.averageScore,
+        minScore: lookupData.minScore,
+        maxScore: lookupData.maxScore,
+        trusted: lookupData.evaluatorCount >= 3,
+      },
+      scores: lookupData.scores.map((e) => ({
+        evaluator: e.evaluator,
+        score: e.score,
+        rating: getScoreConfig(e.score).label,
+        timestamp: e.timestamp ? new Date(Number(e.timestamp) * 1000).toISOString() : null,
+      })),
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `credit-score-${lookupUser.slice(0, 8)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, [lookupData, lookupUser]);
+
+  // ── Request evaluation link (pre-fills submit tab with your address) ──
+
+  const handleRequestEvaluation = useCallback(async () => {
+    if (!walletAddress) return;
+    const url = new URL(window.location.href);
+    url.searchParams.set("submit_for", walletAddress);
+    await copyToClipboard(url.toString());
+    setShareToast(true);
+    setTimeout(() => setShareToast(false), 2000);
+  }, [walletAddress, copyToClipboard]);
+
+  // ── Read ?submit_for= from URL on first mount ─────────────
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const submitFor = params.get("submit_for");
+    if (submitFor && submitFor.startsWith("G")) {
+      setSubmitUser(submitFor);
+      setActiveTab("submit");
+      // Clean the URL param after reading
+      const url = new URL(window.location.href);
+      url.searchParams.delete("submit_for");
+      window.history.replaceState({}, "", url.toString());
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const tabs: { key: Tab; label: string; icon: React.ReactNode; color: string }[] = [
     { key: "lookup", label: "Lookup", icon: <SearchIcon />, color: "#4fc3f7" },
     { key: "submit", label: "Submit", icon: <StarIcon />, color: "#7c6cf0" },
@@ -625,6 +705,19 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
                     ) : undefined
                   }
                 />
+
+                {walletAddress && !lookupData && (
+                  <div className="flex items-center gap-2 rounded-xl border border-[#7c6cf0]/10 bg-[#7c6cf0]/[0.03] px-4 py-2.5 text-xs text-[#7c6cf0]/50">
+                    <LinkIcon />
+                    <span>Share a link so others can rate you:</span>
+                    <button
+                      onClick={handleRequestEvaluation}
+                      className="ml-auto text-[#7c6cf0]/60 hover:text-[#7c6cf0] transition-colors underline underline-offset-2"
+                    >
+                      Copy request link
+                    </button>
+                  </div>
+                )}
 
                 <div className="flex gap-2">
                   <ShimmerButton onClick={handleLookup} disabled={isLookingUp} shimmerColor="#4fc3f7" className="flex-1">
@@ -789,9 +882,16 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
                             <button
                               onClick={handleCopyReport}
                               className="flex items-center gap-1 text-[10px] text-white/25 hover:text-white/60 transition-colors"
-                              title="Copy full score report"
+                              title="Copy full score report as text"
                             >
                               <CopyIcon /> Copy Report
+                            </button>
+                            <button
+                              onClick={handleExportJSON}
+                              className="flex items-center gap-1 text-[10px] text-white/25 hover:text-white/60 transition-colors"
+                              title="Download score data as JSON"
+                            >
+                              <DownloadIcon /> JSON
                             </button>
                             <span className="text-[10px] text-white/25 font-mono">{lookupData.scores.length} total</span>
                           </div>
@@ -994,6 +1094,30 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
                       <span className="text-[10px] font-medium uppercase tracking-wider text-white/25">All Score Entries</span>
                       <span className="text-[10px] text-white/25 font-mono">{historyData.length} total</span>
                     </div>
+
+                    {/* History summary stats */}
+                    {historyData.length > 0 && (() => {
+                      const avg = Math.round(historyData.reduce((s, e) => s + e.score, 0) / historyData.length);
+                      const min = Math.min(...historyData.map((e) => e.score));
+                      const max = Math.max(...historyData.map((e) => e.score));
+                      const cfg = getScoreConfig(avg);
+                      const trusted = historyData.length >= 3;
+                      return (
+                        <div className="grid grid-cols-4 gap-2">
+                          {[
+                            { label: "Evaluators", value: historyData.length, color: "text-white/70" },
+                            { label: "Average", value: avg, color: trusted ? cfg.color : "text-white/30" },
+                            { label: "Lowest", value: min, color: getScoreConfig(min).color },
+                            { label: "Highest", value: max, color: getScoreConfig(max).color },
+                          ].map((s) => (
+                            <div key={s.label} className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-3 text-center">
+                              <div className={`text-base font-bold font-mono ${s.color}`}>{s.value}</div>
+                              <div className="text-[9px] text-white/25 mt-0.5 uppercase tracking-wider">{s.label}</div>
+                            </div>
+                          ))}
+                        </div>
+                      );
+                    })()}
                     {historyData.length === 0 ? (
                       <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-6 text-center">
                         <p className="text-sm text-white/25">No scores found for this user</p>
