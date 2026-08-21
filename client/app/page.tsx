@@ -54,7 +54,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="relative flex flex-col min-h-screen bg-[#050510] overflow-hidden">
+    <div className="relative flex flex-col min-h-screen bg-[#0d0d0d] overflow-hidden">
       {/* 3D Particle Network */}
       {mounted && <ParticleBackground />}
 
@@ -71,37 +71,31 @@ export default function Home() {
       <main className="relative z-10 flex flex-1 w-full max-w-5xl mx-auto flex-col items-center px-4 sm:px-6 pt-10 pb-20">
         {/* Hero */}
         <div className="mb-10 text-center animate-fade-in-up">
-          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.03] px-4 py-1.5 text-sm text-white/50 backdrop-blur-sm">
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#7c6cf0] opacity-75" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-[#7c6cf0]" />
-            </span>
-            Powered by Soroban on Stellar
-          </div>
+          <p className="mb-4 text-[10px] font-mono uppercase tracking-[0.25em] text-[#7c6cf0]/60">
+            Stellar Soroban · Testnet
+          </p>
 
-          <h1 className="mb-3">
-            <span className="block text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight leading-[1.1]">
-              <span className="bg-gradient-to-r from-[#7c6cf0] via-[#4fc3f7] to-[#7c6cf0] bg-[length:200%_auto] animate-gradient-shift bg-clip-text text-transparent">
-                Credit Scoring System
-              </span>
+          <h1 className="mb-4">
+            <span className="block text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white leading-[1.1]">
+              Credit Scoring System
             </span>
           </h1>
 
-          <p className="mx-auto max-w-lg text-sm sm:text-base leading-relaxed text-white/40">
-            Submit, track, and verify credit scores — immutably on Stellar.
+          <p className="mx-auto max-w-md text-sm leading-relaxed text-white/35">
+            Permissionless on-chain credit scores. Submit, verify, and share — immutably on Stellar.
           </p>
 
           {/* Stats */}
-          <div className="mt-6 flex items-center justify-center gap-6 sm:gap-10 animate-fade-in-up-delayed">
+          <div className="mt-8 inline-flex items-center divide-x divide-white/[0.06] rounded border border-white/[0.06] bg-[#131720] animate-fade-in-up-delayed">
             {[
-              { label: "Testnet Users", value: "50+" },
+              { label: "Users", value: "50+" },
               { label: "Finality", value: "~5s" },
               { label: "Cost", value: "<$0.01" },
               { label: "Network", value: "Testnet" },
             ].map((stat) => (
-              <div key={stat.label} className="text-center">
-                <p className="text-lg sm:text-xl font-bold text-white/90 font-mono">{stat.value}</p>
-                <p className="text-[10px] text-white/30 mt-0.5">{stat.label}</p>
+              <div key={stat.label} className="px-5 py-3 text-center">
+                <p className="text-base font-bold text-white font-mono">{stat.value}</p>
+                <p className="text-[9px] uppercase tracking-wider text-white/30 mt-0.5">{stat.label}</p>
               </div>
             ))}
           </div>
@@ -115,38 +109,23 @@ export default function Home() {
         />
 
         {/* Footer */}
-        <div className="mt-10 flex flex-col items-center gap-4 animate-fade-in">
-          <div className="flex items-center gap-3 text-xs text-white/20">
-            {["Submit", "Average", "Trusted"].map((step, i) => (
-              <span key={step} className="flex items-center gap-3">
-                <span className="flex items-center gap-1.5">
-                  <span className={`h-1.5 w-1.5 rounded-full ${
-                    i === 0 ? "bg-[#7c6cf0]/50" : i === 1 ? "bg-[#fbbf24]/50" : "bg-[#34d399]/50"
-                  }`} />
-                  <span className="font-mono">{step}</span>
-                </span>
-                {i < 2 && (
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-white/10">
-                    <path d="M5 12h14M12 5l7 7-7 7" />
-                  </svg>
-                )}
-              </span>
-            ))}
-          </div>
-          <div className="flex flex-wrap items-center justify-center gap-4 text-[10px] text-white/15">
+        <div className="mt-10 flex flex-col items-center gap-3 animate-fade-in">
+          <div className="flex flex-wrap items-center justify-center gap-4 text-[10px] uppercase tracking-wider text-white/15 font-mono">
             <span>Stellar Network</span>
             <span className="h-2.5 w-px bg-white/10" />
             <span>Freighter Wallet</span>
             <span className="h-2.5 w-px bg-white/10" />
             <span>Soroban Smart Contracts</span>
-            <span className="h-2.5 w-px bg-white/10" />
             {mounted && (
-              <button
-                onClick={resetOnboarding}
-                className="text-white/20 hover:text-white/50 transition-colors underline underline-offset-2"
-              >
-                How it works
-              </button>
+              <>
+                <span className="h-2.5 w-px bg-white/10" />
+                <button
+                  onClick={resetOnboarding}
+                  className="text-white/20 hover:text-white/50 transition-colors"
+                >
+                  How it works
+                </button>
+              </>
             )}
           </div>
         </div>

@@ -12,9 +12,7 @@ import {
 } from "@/hooks/contract";
 import { trackContractInteraction } from "@/lib/posthog";
 import { AnimatedCard } from "@/components/ui/animated-card";
-import { Spotlight } from "@/components/ui/spotlight";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 // ── Icons ────────────────────────────────────────────────────
@@ -186,7 +184,7 @@ function MethodSignature({
   color: string;
 }) {
   return (
-    <div className="flex items-center gap-2 rounded-xl border border-white/[0.04] bg-white/[0.02] px-4 py-3 font-mono text-sm">
+    <div className="flex items-center gap-2 rounded-xl border border-white/[0.06] bg-[#0d0d0d] px-4 py-3 font-mono text-sm">
       <span style={{ color }} className="font-semibold">fn</span>
       <span className="text-white/70">{name}</span>
       <span className="text-white/20 text-xs">{params}</span>
@@ -235,7 +233,7 @@ function ScoreBarChart({ scores }: { scores: Array<{ score: number }> }) {
   const avg = Math.round(scores.reduce((s, e) => s + e.score, 0) / scores.length);
 
   return (
-    <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+    <div className="rounded-xl border border-white/[0.07] bg-[#0d0d0d] p-4">
       <div className="flex items-center justify-between mb-3">
         <span className="text-[10px] font-medium uppercase tracking-wider text-white/25">Distribution</span>
         <span className="text-[10px] text-white/25 font-mono">avg {avg}</span>
@@ -292,19 +290,6 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
   const [copiedAddr, setCopiedAddr] = useState<string | null>(null);
   const [shareToast, setShareToast] = useState(false);
 
-  // 3D tilt state
-  const cardRef = useRef<HTMLDivElement>(null);
-  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    const el = cardRef.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
-    const y = -((e.clientY - rect.top) / rect.height - 0.5) * 2;
-    el.style.transform = `perspective(1200px) rotateX(${y * 4}deg) rotateY(${x * 4}deg) scale3d(1.01,1.01,1.01)`;
-  }, []);
-  const handleMouseLeave = useCallback(() => {
-    if (cardRef.current) cardRef.current.style.transform = "perspective(1200px) rotateX(0deg) rotateY(0deg) scale3d(1,1,1)";
-  }, []);
 
   // Submit form state
   const [submitUser, setSubmitUser] = useState("");
@@ -545,10 +530,10 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const tabs: { key: Tab; label: string; icon: React.ReactNode; color: string }[] = [
-    { key: "lookup", label: "Lookup", icon: <SearchIcon />, color: "#4fc3f7" },
-    { key: "submit", label: "Submit", icon: <StarIcon />, color: "#7c6cf0" },
-    { key: "history", label: "History", icon: <ChartIcon />, color: "#fbbf24" },
+  const tabs: { key: Tab; label: string; color: string }[] = [
+    { key: "lookup", label: "Lookup", color: "#4fc3f7" },
+    { key: "submit", label: "Submit", color: "#7c6cf0" },
+    { key: "history", label: "History", color: "#fbbf24" },
   ];
 
   const handleTabKeyDown = useCallback((e: React.KeyboardEvent, currentKey: Tab) => {
@@ -611,28 +596,17 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
         </div>
       )}
 
-      {/* Main Card — 3D tilt */}
-      <div
-        ref={cardRef}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
-        style={{ transition: "transform 0.15s ease-out", transformStyle: "preserve-3d", willChange: "transform" }}
-        className="rounded-2xl"
-      >
+      {/* Main Card */}
+      <div className="rounded-2xl">
         <AnimatedCard className="p-0" containerClassName="rounded-2xl">
           {/* Header */}
           <div className="flex items-center justify-between border-b border-white/[0.06] px-6 py-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#7c6cf0]/20 to-[#fbbf24]/20 border border-white/[0.06]">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#fbbf24]">
-                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                </svg>
-              </div>
               <div>
-                <h3 className="text-sm font-semibold text-white/90">Credit Score</h3>
+                <h3 className="text-[11px] font-semibold uppercase tracking-widest text-white/70">Credit Scoring System</h3>
                 <button
                   onClick={() => copyToClipboard(CONTRACT_ADDRESS)}
-                  className="flex items-center gap-1.5 text-[10px] text-white/25 font-mono mt-0.5 hover:text-white/50 transition-colors group"
+                  className="flex items-center gap-1.5 text-[9px] text-white/20 font-mono mt-0.5 hover:text-white/45 transition-colors group"
                   title="Copy contract address"
                 >
                   {truncate(CONTRACT_ADDRESS)}
@@ -642,11 +616,13 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
                 </button>
               </div>
             </div>
-            <Badge variant="info" className="text-[10px]">Soroban</Badge>
+            <div className="flex items-center gap-1.5 rounded border border-[#7c6cf0]/20 bg-[#7c6cf0]/[0.05] px-2.5 py-1 text-[9px] font-mono uppercase tracking-wider text-[#7c6cf0]/60">
+              Soroban
+            </div>
           </div>
 
           {/* Tabs */}
-          <div className="flex border-b border-white/[0.06] px-2">
+          <div className="flex border-b border-white/[0.06]">
             {tabs.map((t) => (
               <button
                 key={t.key}
@@ -656,16 +632,16 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
                 onClick={() => { setActiveTab(t.key); setError(null); setLookupData(null); setHistoryData(null); }}
                 onKeyDown={(e) => handleTabKeyDown(e, t.key)}
                 className={cn(
-                  "relative flex items-center gap-2 px-5 py-3.5 text-sm font-medium transition-all",
-                  activeTab === t.key ? "text-white/90" : "text-white/35 hover:text-white/55"
+                  "relative px-6 py-3.5 text-[11px] font-semibold uppercase tracking-widest transition-all",
+                  activeTab === t.key ? "text-white/90" : "text-white/30 hover:text-white/55"
                 )}
+                style={activeTab === t.key ? { color: t.color } : undefined}
               >
-                <span style={activeTab === t.key ? { color: t.color } : undefined}>{t.icon}</span>
                 {t.label}
                 {activeTab === t.key && (
                   <span
-                    className="absolute bottom-0 left-2 right-2 h-[2px] rounded-full transition-all"
-                    style={{ background: `linear-gradient(to right, ${t.color}, ${t.color}66)` }}
+                    className="absolute bottom-0 left-3 right-3 h-[1.5px] rounded-full"
+                    style={{ background: t.color }}
                   />
                 )}
               </button>
@@ -726,7 +702,7 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
                   {lookupData && (
                     <button
                       onClick={handleShare}
-                      className="flex items-center gap-1.5 rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-2 text-xs text-white/40 hover:text-white/70 hover:border-white/[0.10] transition-all"
+                      className="flex items-center gap-1.5 rounded-xl border border-white/[0.07] bg-[#0d0d0d] px-4 py-2 text-xs text-white/40 hover:text-white/70 hover:border-white/[0.10] transition-all"
                       title="Copy shareable link"
                     >
                       <ShareIcon /> Share
@@ -735,7 +711,7 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
                   {lookupData && (
                     <button
                       onClick={() => { setLookupData(null); setLookupUser(""); setError(null); const url = new URL(window.location.href); url.searchParams.delete("user"); window.history.replaceState({}, "", url.toString()); }}
-                      className="flex items-center gap-1.5 rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-xs text-white/30 hover:text-white/60 hover:border-white/[0.10] transition-all"
+                      className="flex items-center gap-1.5 rounded-xl border border-white/[0.07] bg-[#0d0d0d] px-3 py-2 text-xs text-white/30 hover:text-white/60 hover:border-white/[0.10] transition-all"
                       title="Clear results"
                     >
                       &times;
@@ -764,11 +740,11 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
 
                     {/* Summary Cards */}
                     <div className="grid grid-cols-2 gap-3">
-                      <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 text-center">
+                      <div className="rounded-xl border border-white/[0.07] bg-[#0d0d0d] p-4 text-center">
                         <div className="text-2xl font-bold text-white/90">{lookupData.evaluatorCount}</div>
                         <div className="text-[10px] text-white/25 mt-1 uppercase tracking-wider">Evaluators</div>
                       </div>
-                      <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 text-center">
+                      <div className="rounded-xl border border-white/[0.07] bg-[#0d0d0d] p-4 text-center">
                         {(() => {
                           const cfg = getScoreConfig(lookupData.averageScore);
                           return (
@@ -788,13 +764,13 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
                     {/* Score Spread */}
                     {lookupData.evaluatorCount > 1 && (
                       <div className="grid grid-cols-2 gap-3">
-                        <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-3 text-center">
+                        <div className="rounded-xl border border-white/[0.07] bg-[#0d0d0d] p-3 text-center">
                           <div className={cn("text-lg font-bold font-mono", getScoreConfig(lookupData.minScore).color)}>
                             {lookupData.minScore}
                           </div>
                           <div className="text-[10px] text-white/25 mt-0.5 uppercase tracking-wider">Lowest</div>
                         </div>
-                        <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-3 text-center">
+                        <div className="rounded-xl border border-white/[0.07] bg-[#0d0d0d] p-3 text-center">
                           <div className={cn("text-lg font-bold font-mono", getScoreConfig(lookupData.maxScore).color)}>
                             {lookupData.maxScore}
                           </div>
@@ -805,7 +781,7 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
 
                     {/* Score progress bar */}
                     {lookupData.averageScore > 0 && (
-                      <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+                      <div className="rounded-xl border border-white/[0.07] bg-[#0d0d0d] p-4">
                         <div className="flex items-center justify-between mb-3">
                           <span className="text-[10px] font-medium uppercase tracking-wider text-white/25">Score Position</span>
                           <div className="flex items-center gap-2">
@@ -848,7 +824,7 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
                       })).filter((b) => b.count > 0);
                       if (counts.length <= 1) return null;
                       return (
-                        <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+                        <div className="rounded-xl border border-white/[0.07] bg-[#0d0d0d] p-4">
                           <span className="text-[10px] font-medium uppercase tracking-wider text-white/25 block mb-3">Rating Breakdown</span>
                           <div className="space-y-2">
                             {counts.map((b) => (
@@ -875,7 +851,7 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
 
                     {/* Score Entries */}
                     {lookupData.scores.length > 0 && (
-                      <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] overflow-hidden">
+                      <div className="rounded-xl border border-white/[0.07] bg-[#0d0d0d] overflow-hidden">
                         <div className="border-b border-white/[0.06] px-4 py-3 flex items-center justify-between">
                           <span className="text-[10px] font-medium uppercase tracking-wider text-white/25">Score Entries</span>
                           <div className="flex items-center gap-3">
@@ -902,7 +878,7 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
                             const isSelf = walletAddress && entry.evaluator === walletAddress;
                             const isSelfScored = walletAddress && entry.evaluator === lookupUser;
                             return (
-                              <div key={i} className="flex items-center justify-between rounded-lg px-3 py-2 border border-white/[0.04] bg-white/[0.01]">
+                              <div key={i} className="flex items-center justify-between rounded-lg px-3 py-2 border border-white/[0.06] bg-[#0d0d0d]">
                                 <div className="flex flex-col gap-0.5">
                                   <div className="flex items-center gap-2">
                                     <span className="font-mono text-xs text-white/50">{truncate(entry.evaluator)}</span>
@@ -936,7 +912,7 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
                     )}
 
                     {lookupData.scores.length === 0 && (
-                      <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-6 text-center">
+                      <div className="rounded-xl border border-white/[0.07] bg-[#0d0d0d] px-4 py-6 text-center">
                         <p className="text-sm text-white/25">No scores found for this user</p>
                       </div>
                     )}
@@ -1080,7 +1056,7 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
                   {historyData && (
                     <button
                       onClick={() => { setHistoryData(null); setHistoryUser(""); setError(null); }}
-                      className="flex items-center gap-1.5 rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-xs text-white/30 hover:text-white/60 hover:border-white/[0.10] transition-all"
+                      className="flex items-center gap-1.5 rounded-xl border border-white/[0.07] bg-[#0d0d0d] px-3 py-2 text-xs text-white/30 hover:text-white/60 hover:border-white/[0.10] transition-all"
                       title="Clear results"
                     >
                       &times;
@@ -1110,7 +1086,7 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
                             { label: "Lowest", value: min, color: getScoreConfig(min).color },
                             { label: "Highest", value: max, color: getScoreConfig(max).color },
                           ].map((s) => (
-                            <div key={s.label} className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-3 text-center">
+                            <div key={s.label} className="rounded-xl border border-white/[0.07] bg-[#0d0d0d] p-3 text-center">
                               <div className={`text-base font-bold font-mono ${s.color}`}>{s.value}</div>
                               <div className="text-[9px] text-white/25 mt-0.5 uppercase tracking-wider">{s.label}</div>
                             </div>
@@ -1119,14 +1095,14 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
                       );
                     })()}
                     {historyData.length === 0 ? (
-                      <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-6 text-center">
+                      <div className="rounded-xl border border-white/[0.07] bg-[#0d0d0d] px-4 py-6 text-center">
                         <p className="text-sm text-white/25">No scores found for this user</p>
                       </div>
                     ) : (
                       historyData.map((entry, i) => {
                         const cfg = getScoreConfig(entry.score);
                         return (
-                          <div key={i} className="flex items-center justify-between rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3">
+                          <div key={i} className="flex items-center justify-between rounded-xl border border-white/[0.07] bg-[#0d0d0d] px-4 py-3">
                             <div className="flex items-center gap-3">
                               <div className="flex h-7 w-7 items-center justify-center rounded-lg border border-white/[0.06] bg-white/[0.02]">
                                 <UserIcon />
@@ -1173,13 +1149,19 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
           </div>
 
           {/* Footer */}
-          <div className="border-t border-white/[0.04] px-6 py-3 flex items-center justify-between">
-            <p className="text-[10px] text-white/15">Credit Score &middot; Soroban</p>
-            <div className="flex items-center gap-2">
-              {["0-399", "400-599", "600-699", "700-799", "800-1000"].map((s, i) => (
-                <span key={s} className="flex items-center gap-1.5">
-                  <span className="font-mono text-[9px] text-white/15">{s}</span>
-                  {i < 4 && <span className="text-white/10 text-[8px]">&rarr;</span>}
+          <div className="border-t border-white/[0.06] px-6 py-3 flex items-center justify-between">
+            <p className="text-[9px] font-mono uppercase tracking-widest text-white/15">Stellar Testnet</p>
+            <div className="flex items-center gap-3">
+              {[
+                { label: "Very Poor", color: "#f87171" },
+                { label: "Poor", color: "#fb923c" },
+                { label: "Fair", color: "#fbbf24" },
+                { label: "Good", color: "#4fc3f7" },
+                { label: "Excellent", color: "#34d399" },
+              ].map((s) => (
+                <span key={s.label} className="flex items-center gap-1">
+                  <span className="h-1.5 w-1.5 rounded-full" style={{ background: s.color }} />
+                  <span className="text-[8px] font-mono text-white/15">{s.label}</span>
                 </span>
               ))}
             </div>

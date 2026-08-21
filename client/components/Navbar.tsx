@@ -2,17 +2,6 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { NETWORK } from "@/hooks/contract";
-import { Badge } from "@/components/ui/badge";
-
-function WalletIcon({ size = 16 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" />
-      <path d="M3 5v14a2 2 0 0 0 2 2h16v-5" />
-      <path d="M18 12a2 2 0 0 0 0 4h4v-4Z" />
-    </svg>
-  );
-}
 
 function CopyIcon() {
   return (
@@ -40,6 +29,16 @@ function PowerIcon() {
   );
 }
 
+function WalletIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" />
+      <path d="M3 5v14a2 2 0 0 0 2 2h16v-5" />
+      <path d="M18 12a2 2 0 0 0 0 4h4v-4Z" />
+    </svg>
+  );
+}
+
 interface NavbarProps {
   walletAddress: string | null;
   onConnect: () => Promise<void>;
@@ -57,16 +56,8 @@ export default function Navbar({
 }: NavbarProps) {
   const [copied, setCopied] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
   const [connectError, setConnectError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 10);
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  // Close dropdown on outside click
   useEffect(() => {
     if (!showDropdown) return;
     const close = () => setShowDropdown(false);
@@ -84,30 +75,20 @@ export default function Navbar({
   const truncate = (addr: string) => `${addr.slice(0, 4)}...${addr.slice(-4)}`;
 
   return (
-    <nav
-      className={`sticky top-0 z-50 w-full border-b transition-all duration-300 animate-fade-in-down ${
-        scrolled
-          ? "border-white/[0.08] bg-[#050510]/90 backdrop-blur-2xl shadow-[0_4px_30px_rgba(0,0,0,0.5)]"
-          : "border-white/[0.04] bg-transparent backdrop-blur-sm"
-      }`}
-    >
+    <nav className="sticky top-0 z-50 w-full border-b border-white/[0.06] bg-[#0d0d0d] animate-fade-in-down">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
         {/* Logo */}
         <div className="flex items-center gap-3">
-          <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#7c6cf0] to-[#4fc3f7] shadow-[0_0_20px_rgba(124,108,240,0.3)]">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2" />
-              <path d="M15 18H9" />
-              <path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14" />
-              <circle cx="17" cy="18" r="2" />
-              <circle cx="7" cy="18" r="2" />
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#7c6cf0]/30 bg-[#7c6cf0]/10">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7c6cf0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
             </svg>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-base font-semibold tracking-tight text-white">
-              Credit Scoring System
+          <div className="flex items-center gap-2.5">
+            <span className="text-sm font-semibold tracking-widest uppercase text-white/90">
+              Credit Scoring
             </span>
-            <span className="hidden sm:inline-block text-[10px] font-mono text-white/20 border border-white/[0.06] rounded px-1.5 py-0.5">
+            <span className="text-[9px] font-mono text-white/20 border border-white/[0.06] rounded px-1.5 py-0.5 tracking-wider">
               v2.0
             </span>
           </div>
@@ -118,68 +99,54 @@ export default function Navbar({
           {onOpenGuide && (
             <button
               onClick={onOpenGuide}
-              className="hidden sm:flex items-center gap-1.5 rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-1.5 text-xs text-white/40 hover:border-white/[0.12] hover:text-white/70 transition-all"
+              className="hidden sm:flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-white/30 hover:text-white/60 transition-colors px-2 py-1.5"
             >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10" />
-                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
-                <line x1="12" y1="17" x2="12.01" y2="17" />
-              </svg>
               Guide
             </button>
           )}
-          <Badge variant="success">
+
+          {/* Network badge */}
+          <div className="flex items-center gap-1.5 rounded border border-[#34d399]/20 bg-[#34d399]/[0.05] px-2.5 py-1 text-[10px] font-mono uppercase tracking-wider text-[#34d399]/70">
             <span className="h-1.5 w-1.5 rounded-full bg-[#34d399] animate-pulse" />
             {NETWORK}
-          </Badge>
+          </div>
 
           {walletAddress ? (
             <div className="relative">
               <button
                 onClick={(e) => { e.stopPropagation(); setShowDropdown(!showDropdown); }}
-                className="flex items-center gap-2.5 rounded-xl border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-sm transition-all hover:border-white/[0.15] hover:bg-white/[0.06]"
+                className="flex items-center gap-2 rounded border border-white/[0.08] bg-[#131720] px-3 py-1.5 text-xs transition-all hover:border-white/[0.15]"
               >
-                <div className="h-6 w-6 rounded-full bg-gradient-to-br from-[#7c6cf0] to-[#4fc3f7] p-[1.5px]">
-                  <div className="flex h-full w-full items-center justify-center rounded-full bg-[#0a0a1a] text-[8px] font-bold text-white/80">
-                    {walletAddress.slice(0, 2)}
-                  </div>
-                </div>
-                <span className="font-mono text-xs text-white/70">
-                  {truncate(walletAddress)}
-                </span>
+                <span className="h-2 w-2 rounded-full bg-[#7c6cf0]" />
+                <span className="font-mono text-white/60">{truncate(walletAddress)}</span>
                 <svg
-                  width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-                  className={`text-white/30 transition-transform duration-200 ${showDropdown ? "rotate-180" : ""}`}
+                  width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                  className={`text-white/25 transition-transform duration-200 ${showDropdown ? "rotate-180" : ""}`}
                 >
                   <polyline points="6 9 12 15 18 9" />
                 </svg>
               </button>
 
-              {/* Dropdown */}
               {showDropdown && (
                 <div
-                  className="absolute right-0 top-full mt-2 w-64 overflow-hidden rounded-xl border border-white/[0.08] bg-[#0c0c1d]/95 backdrop-blur-2xl shadow-2xl animate-fade-in-up"
+                  className="absolute right-0 top-full mt-2 w-64 overflow-hidden rounded-xl border border-white/[0.08] bg-[#131720] shadow-2xl animate-fade-in-up"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <div className="p-3 border-b border-white/[0.06]">
-                    <p className="text-[10px] uppercase tracking-wider text-white/25 mb-2">
-                      Connected Wallet
-                    </p>
-                    <p className="font-mono text-xs text-white/60 break-all leading-relaxed">
-                      {walletAddress}
-                    </p>
+                    <p className="text-[9px] uppercase tracking-widest text-white/25 mb-2">Connected Wallet</p>
+                    <p className="font-mono text-xs text-white/50 break-all leading-relaxed">{walletAddress}</p>
                   </div>
                   <div className="p-1.5">
                     <button
                       onClick={() => { handleCopy(); setShowDropdown(false); }}
-                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-white/60 hover:bg-white/[0.06] hover:text-white/90 transition-colors"
+                      className="flex w-full items-center gap-2.5 rounded px-3 py-2 text-xs text-white/50 hover:bg-white/[0.05] hover:text-white/80 transition-colors"
                     >
                       {copied ? <CheckSmallIcon /> : <CopyIcon />}
                       {copied ? "Copied!" : "Copy Address"}
                     </button>
                     <button
                       onClick={() => { onDisconnect(); setShowDropdown(false); }}
-                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-[#f87171]/70 hover:bg-[#f87171]/[0.08] hover:text-[#f87171] transition-colors"
+                      className="flex w-full items-center gap-2.5 rounded px-3 py-2 text-xs text-[#f87171]/60 hover:bg-[#f87171]/[0.06] hover:text-[#f87171] transition-colors"
                     >
                       <PowerIcon />
                       Disconnect
@@ -200,26 +167,24 @@ export default function Navbar({
                   }
                 }}
                 disabled={isConnecting}
-                className="relative overflow-hidden rounded-xl bg-gradient-to-r from-[#7c6cf0] to-[#5b8cf0] p-[1px] transition-all hover:shadow-[0_0_25px_rgba(124,108,240,0.25)] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 rounded border border-[#7c6cf0]/40 bg-[#7c6cf0]/10 px-4 py-1.5 text-xs font-medium text-[#7c6cf0] hover:bg-[#7c6cf0]/15 hover:border-[#7c6cf0]/60 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <div className="flex items-center gap-2 rounded-[11px] bg-[#0c0c1d]/90 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm">
-                  {isConnecting ? (
-                    <>
-                      <svg className="animate-spin" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                        <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-                      </svg>
-                      Connecting...
-                    </>
-                  ) : (
-                    <>
-                      <WalletIcon size={14} />
-                      Connect
-                    </>
-                  )}
-                </div>
+                {isConnecting ? (
+                  <>
+                    <svg className="animate-spin" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+                    </svg>
+                    Connecting...
+                  </>
+                ) : (
+                  <>
+                    <WalletIcon />
+                    Connect Wallet
+                  </>
+                )}
               </button>
               {connectError && (
-                <p className="text-[10px] text-[#f87171]/80 max-w-[200px] text-right">{connectError}</p>
+                <p className="text-[10px] text-[#f87171]/70 max-w-[200px] text-right">{connectError}</p>
               )}
             </div>
           )}
