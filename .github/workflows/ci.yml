@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  smart-contract:
+    name: Smart Contract (Rust / Soroban)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: contract
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32v1-none
+
+      - name: Cache Rust dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            contract/target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('contract/Cargo.toml') }}
+          restore-keys: ${{ runner.os }}-cargo-
+
+      - name: Build contract (WASM)
+        run: cargo build --target wasm32v1-none --release
+
+      - name: Run unit tests
+        run: cargo test
+
+  frontend:
+    name: Frontend (Next.js)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: client
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: 1

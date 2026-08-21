@@ -1,8 +1,18 @@
 import type { NextConfig } from "next";
+import { withSentryConfig } from "@sentry/nextjs";
 
 const nextConfig: NextConfig = {
   /* config options here */
-  allowedDevOrigins: ['svc-5c5f1f0d-morphvm-f6tljq33.http.cloud.morph.so'],
 };
 
-export default nextConfig;
+export default withSentryConfig(nextConfig, {
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  silent: !process.env.CI,
+  widenClientFileUpload: true,
+  webpack: {
+    treeshake: {
+      removeDebugLogging: true,
+    },
+  },
+});

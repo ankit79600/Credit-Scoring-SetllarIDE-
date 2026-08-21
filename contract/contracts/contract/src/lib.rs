@@ -6,6 +6,7 @@ use soroban_sdk::{contract, contractimpl, contracttype, Address, Env, Vec};
 pub struct ScoreEntry {
     pub evaluator: Address,
     pub score: u32,
+    pub timestamp: u64,
 }
 
 #[contracttype]
@@ -31,7 +32,7 @@ impl Contract {
             .get(&key)
             .unwrap_or_else(|| Vec::new(&env));
 
-        // Check if evaluator already submitted - update if so
+        let timestamp = env.ledger().timestamp();
         let mut found = false;
         for i in 0..scores.len() {
             if let Some(entry) = scores.get(i) {
@@ -41,6 +42,7 @@ impl Contract {
                         ScoreEntry {
                             evaluator: evaluator.clone(),
                             score,
+                            timestamp,
                         },
                     );
                     found = true;
@@ -49,12 +51,17 @@ impl Contract {
             }
         }
 
-        // Add new entry if not found
         if !found {
-            scores.push_back(ScoreEntry { evaluator, score });
+            scores.push_back(ScoreEntry {
+                evaluator,
+                score,
+                timestamp,
+            });
         }
 
         env.storage().instance().set(&key, &scores);
+        // Extend TTL: at least 30 days, up to 90 days (at ~5s per ledger)
+        env.storage().instance().extend_ttl(518_400, 1_555_200);
     }
 
     /// Get all score entries for a user
@@ -77,6 +84,99 @@ impl Contract {
         if scores.is_empty() {
             return 0;
         }
+        let mut total: u64 = 0;
+        for i in 0..scores.len() {
+            if let Some(entry) = scores.get(i) {
+                total += entry.score as u64;
+            }
+        }
+        (total / scores.len() as u64) as u32
+    }
+
+    /// Get the lowest score submitted for a user. Returns 0 if no scores exist.
+    pub fn get_min_score(env: Env, user: Address) -> u32 {
+        let scores = Self::get_scores(env, user);
+        if scores.is_empty() {
+            return 0;
+        }
+        let mut min = u32::MAX;
+        for i in 0..scores.len() {
+            if let Some(entry) = scores.get(i) {
+                if entry.score < min {
+                    min = entry.score;
+                }
+            }
+        }
+        min
+    }
+
+    /// Get the highest score submitted for a user. Returns 0 if no scores exist.
+    pub fn get_max_score(env: Env, user: Address) -> u32 {
+        let scores = Self::get_scores(env, user);
+        if scores.is_empty() {
+            return 0;
+        }
+        let mut max = 0u32;
+        for i in 0..scores.len() {
+            if let Some(entry) = scores.get(i) {
+                if entry.score > max {
+                    max = entry.score;
+                }
+            }
+        }
+        max
+    }
+
+    /// Remove an evaluator's score for a user. Only the evaluator themselves can remove their score.
+    pub fn remove_score(env: Env, user: Address, evaluator: Address) {
+        evaluator.require_auth();
+        let key = DataKey::Scores(user.clone());
+        let mut scores: Vec<ScoreEntry> = env
+            .storage()
+            .instance()
+            .get(&key)
+            .unwrap_or_else(|| Vec::new(&env));
+
+        let mut new_scores: Vec<ScoreEntry> = Vec::new(&env);
+        for i in 0..scores.len() {
+            if let Some(entry) = scores.get(i) {
+                if entry.evaluator != evaluator {
+                    new_scores.push_back(entry);
+                }
+            }
+        }
+        scores = new_scores;
+        env.storage().instance().set(&key, &scores);
+        env.storage().instance().extend_ttl(518_400, 1_555_200);
+    }
+
+    /// Check whether a specific evaluator has already submitted a score for a user.
+    pub fn has_evaluator(env: Env, user: Address, evaluator: Address) -> bool {
+        let scores = Self::get_scores(env, user);
+        for i in 0..scores.len() {
+            if let Some(entry) = scores.get(i) {
+                if entry.evaluator == evaluator {
+                    return true;
+                }
+            }
+        }
+        false
+    }
+
+    /// Returns the average score only if at least min_evaluators have submitted.
+    /// Returns 0 if the threshold is not met (prevents single-evaluator gaming).
+    pub fn get_average_score_if_threshold(env: Env, user: Address, min_evaluators: u32) -> u32 {
+        let key = DataKey::Scores(user);
+        let scores: Vec<ScoreEntry> = env
+            .storage()
+            .instance()
+            .get(&key)
+            .unwrap_or_else(|| Vec::new(&env));
+
+        if scores.is_empty() || scores.len() < min_evaluators {
+            return 0;
+        }
+
         let mut total: u64 = 0;
         for i in 0..scores.len() {
             if let Some(entry) = scores.get(i) {
