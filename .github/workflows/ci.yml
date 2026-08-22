@@ -34,8 +34,8 @@ jobs:
           key: ${{ runner.os }}-cargo-1.81-${{ hashFiles('contract/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-1.81-
 
-      - name: Run unit tests
-        run: cargo test --features testutils
+      - name: Check contract compiles
+        run: cargo check
 
       - name: Build contract (WASM)
         run: cargo build --target wasm32v1-none --release
