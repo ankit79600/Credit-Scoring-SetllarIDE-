@@ -7,6 +7,7 @@ on:
     branches: [main]
 
 jobs:
+  # ── Smart Contract ────────────────────────────────────────
   smart-contract:
     name: Smart Contract (Rust / Soroban)
     runs-on: ubuntu-latest
@@ -29,15 +30,16 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             contract/target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('contract/Cargo.toml') }}
+          key: ${{ runner.os }}-cargo-${{ hashFiles('contract/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-
-
-      - name: Build contract (WASM)
-        run: cargo build --target wasm32v1-none --release
 
       - name: Run unit tests
         run: cargo test
 
+      - name: Build contract (WASM)
+        run: cargo build --target wasm32v1-none --release
+
+  # ── Frontend ──────────────────────────────────────────────
   frontend:
     name: Frontend (Next.js)
     runs-on: ubuntu-latest
@@ -52,9 +54,14 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: client/package-lock.json
 
       - name: Install dependencies
         run: npm install
+
+      - name: TypeScript check
+        run: npx tsc --noEmit
 
       - name: Build
         run: npm run build

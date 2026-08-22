@@ -1,13 +1,20 @@
-name: Deploy
+name: Deploy Contract
 
+# Manual trigger only — prevents accidental contract redeployment
+# (each deploy creates a NEW contract address, breaking the frontend)
+# Run this only when the contract code actually changes and needs redeployment.
 on:
-  push:
-    branches: [main]
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type "deploy" to confirm contract redeployment'
+        required: true
 
 jobs:
   deploy-contract:
     name: Deploy Smart Contract to Stellar Testnet
     runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.confirm == 'deploy' }}
     defaults:
       run:
         working-directory: contract
@@ -27,7 +34,7 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             contract/target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('contract/Cargo.toml') }}
+          key: ${{ runner.os }}-cargo-${{ hashFiles('contract/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-
 
       - name: Install Stellar CLI
@@ -44,32 +51,3 @@ jobs:
             --source-account ${{ secrets.STELLAR_SECRET_KEY }}
         env:
           STELLAR_SECRET_KEY: ${{ secrets.STELLAR_SECRET_KEY }}
-
-  deploy-frontend:
-    name: Deploy Frontend to Vercel
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: client
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: client/package-lock.json
-
-      - name: Install Vercel CLI
-        run: npm install --global vercel@latest
-
-      - name: Pull Vercel environment info
-        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
-
-      - name: Build project artifacts
-        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
-
-      - name: Deploy to Vercel
-        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
