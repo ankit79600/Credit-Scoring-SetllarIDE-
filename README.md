@@ -405,31 +405,65 @@ Every improvement below traces directly to user feedback and links to the commit
 
 | User | Address | Avg Score | Evaluators |
 |---|---|---|---|
-| User 1 | `GATKS6ZEKEY6CSBARSZDEX5KI3IR5SJCKJUVEHIHT5BOK73FZMPP7D4T` | 750 (Good) | 10 |
-| User 2 | *(run script)* | 689 (Fair) | 10 |
-| User 3 | *(run script)* | 453 (Poor) | 10 |
-| User 4 | *(run script)* | 876 (Excellent) | 10 |
-| User 5 | *(run script)* | 565 (Fair) | 10 |
+| User 1 | `GCF5UKJ34CN3QEPA4UA3ZWV5RQNDBXSRX66CK7CGXTXRAPRV5YTO3V7G` | 750 (Good) | 10 |
+| User 2 | `GBK2H6A5QEFM5WXWIGQKAUB5GFZKOYB3T4B4WVCSL476CP2BC5LQ5TAD` | 684 (Fair) | 10 |
+| User 3 | `GD2RGU6SQXCCWHTPL6KSJHJD57YNR2GNM7CTDDCKLAB6SUH3ODKWEMTS` | 445 (Poor) | 10 |
+| User 4 | `GCY4ZWHCOXFRCCCHXMEEMQ2NNLRDNCA2WWTZM5KU4KDJMO4TCR6OGM45` | 875 (Excellent) | 10 |
+| User 5 | `GC6IMMEGEEKNHSOFIYZTI4OFWPCLBJEKDLVUVPCJOCO4SGGQEHXIXHWI` | 565 (Fair) | 10 |
 
 ### Verified On-Chain Transactions
 
-| # | Wallet (truncated) | Transaction Hash | Score |
-|---|---|---|---|
-| 1 | GBMY...7UCG | `4c3d507aa600a7db6d4dfb9e5e84dc0498b71f98a6b494d1fda6833d194bd6e4` | 820 |
-| 2 | GAS3...FID2 | `6027352885f2eb48bf75896e5cea5fa5dcc9ad6872edd5e9831309f987cbdebb` | 750 |
-| 3 | GBW4...XHED | `69daa70823e32cfe92a8ec705bcd7f73fd78f5b93b4a096dbb14ee2275c9e256` | 680 |
-| 4 | GDS5...GWHJ | `5fa9b8ce00fe169023b139207ab8966324c85a84f768b1a13af7985d78ce81cc` | 910 |
-| 5 | GDYV...FRLY | `7a4285e570a422a2c19f76d84002f0e3d649dd67bbed4fadcee87fe457d5ba70` | 540 |
-| 6 | GAGL...SJ26 | `8999955c5f185932af42d02732bae49d53dc7074db81c67a58baac621afa4d18` | 770 |
-| 7 | GCB6...ECXW | `53966d0b0ee05b39f0706a713834cfa5d5d06733caad544779abbe81d2164eba` | 830 |
-| 8 | GB7D...54DR | `d1acb8194595473ab8e0245d57ab0ecdd41f839648d2dd320439a16259509aa2` | 600 |
-| 9 | GDPU...JKWF | `857da1ceadde640010efd1969b4518a635a9cbbc605857598b89c687dbacb299` | 720 |
-| 10 | GBJB...TBUD | `b5197eea090cdbc3eb65bb00d9eada866a61c8f997aaf37d06b1781ae6d313f4` | 880 |
-
-> **To generate remaining 40 transactions** (4 more target users × 10 evaluators):
-> ```bash
-> cd client && node ../scripts/generate-interactions.mjs
-> ```
+| # | Target | Wallet (truncated) | Transaction Hash | Score |
+|---|---|---|---|---|
+| 1 | User 1 | GBFD...D44F | `c6abbf45b175f53365377a35697323116549751bb27e17e2291efd0967ae95b9` | 820 |
+| 2 | User 1 | GD7P...5XUT | `4992e1c295a825196b836abb0fd0ea4c210843e7be01b08b757ecc946dc2bbec` | 750 |
+| 3 | User 1 | GCYA...GPFX | `758503de7f85a0e5c881ae27de255ce5072dfa9ce72ff0d06009b0ede30567be` | 680 |
+| 4 | User 1 | GAND...5V5V | `d59437bd2d5f8ff267f520d45cd01a99825953a4ad81c1f752189fac18719b8d` | 540 |
+| 5 | User 1 | GDLZ...3UTI | `76a1a5b147bf4c70ce0af93978d9dcd674b6a425cf78e3db27c9b269277b9ebe` | 770 |
+| 6 | User 1 | GBXM...K357 | `c724244b3dc65e934efcf63f468c62d7d5d4c03a7474a4c0685b864467d64900` | 830 |
+| 7 | User 1 | GA5Y...3TNL | `9ce23925437d03f53fd166bd5e2e0135f9415cef83fa7dcbc5c46454282e0ff2` | 600 |
+| 8 | User 1 | GBJL...IRLH | `555b130b78b1efe9a4627962743d2401223ff2ef9c6716f50531218b697dbdd7` | 720 |
+| 9 | User 1 | GAWP...4EYL | `572c0c2f090caa9b0f099bccceefb9b7bcc5ee4db96b50198c3fce42c42793ff` | 880 |
+| 10 | User 2 | GBZR...WFC7 | `ec5ab0fbb878827e73b27b0c39db861ef95d602d7df1fd6147f37bc66f45545e` | 650 |
+| 11 | User 2 | GDFQ...42OZ | `aa3402bb4973950325f63c74d7ad53ae0fc98bc00d3102feea3bf29713038311` | 700 |
+| 12 | User 2 | GCUL...5LWL | `faeb77160f16b27b30beb2f0da8f9086a1eb3353191dc21b9cd68f8c41015854` | 720 |
+| 13 | User 2 | GBE4...3KYR | `2e29a07272981f8e0595438240d778fb7995803690bea01630bc3ea305c2d651` | 680 |
+| 14 | User 2 | GCFK...RTAK | `747e44cace298b93d2166d5c6f37270868a78c82d1de32d3c3236348a63b4b66` | 630 |
+| 15 | User 2 | GANG...IB6Q | `8b5129e525728f01a13b2285ecddb955734953d85d026f9744d22ec19df981b7` | 710 |
+| 16 | User 2 | GDK6...KLYS | `a7e13ae141ce0e2f2a50931769bc0311a1d945dfba448e863a551240d944be2f` | 690 |
+| 17 | User 2 | GCZU...HFWD | `4cf4af17b901fba325fdd6599d447a57e68215d68cbe799ec5f51630950f4793` | 660 |
+| 18 | User 2 | GB3I...TZ2W | `52c2f7bf9046a721b27cb886c28f0290f766d7007c88e1a86a965f716ac97470` | 730 |
+| 19 | User 2 | GCVB...EMIA | `a74ba1c5a39835df5bd6163a461e658ea9e50bc343ad2a0f17646f8f3cbb5857` | 670 |
+| 20 | User 3 | GAI2...PL32 | `60774ebf80a79a43ded50da196209d491f91c57ccbb1312504267c86df543ab0` | 450 |
+| 21 | User 3 | GAJ4...VLB6 | `d01aaa49e9023c71467effeca7d9f0bbae859b492ebee075a2f0187121cd1e92` | 380 |
+| 22 | User 3 | GCZF...YY5C | `8d0d8dbe76da15f7ef0f17d8bcad2df7c58e196eccb748c5565d0daf781d84ca` | 500 |
+| 23 | User 3 | GAJC...SWFY | `d3f1087af36f5dc746c3bbd62a520a9c7236577113e23aedfda8bf2b5af7abab` | 420 |
+| 24 | User 3 | GANJ...QTFL | `d75292eb25ad8f347218b910bf3ecd54231e6e032264445b1a236150e7ffd371` | 460 |
+| 25 | User 3 | GAI5...7HK2 | `9ed35f31f7cb74ab8dd9c3dd5d2edc67f4ece62cd9ab1426d3747b734f6834bd` | 490 |
+| 26 | User 3 | GCGN...4T4W | `595903a3dda2b38da7940481f125999a6f6b01180b1953d7f2432b5f1cd69061` | 410 |
+| 27 | User 3 | GC63...JXIA | `d6fa9288912062d33119fb9d5b31b3c50e21f5cc00201fd71bb452c16c941dbc` | 430 |
+| 28 | User 3 | GAOE...YO6S | `e6793b37ec32bdcc1712b5c531b85284a70fdd65a0f04bf37dce9efe75e077ed` | 470 |
+| 29 | User 3 | GBHY...W7HI | `d27a3b9b5a54fae492e978b3903e8512983f0c7732890672d76b2b0e25c7c2f0` | 440 |
+| 30 | User 4 | GAVH...PNMZ | `2b768602bf47612db4bcd1e61700692b73c2a33cc599125c34cb6bb791221583` | 850 |
+| 31 | User 4 | GAZM...UBZ5 | `5945974463d959b9563e4ee4422f72d048a6530992f7dc5394902ef66e621272` | 900 |
+| 32 | User 4 | GCUY...SBIV | `f8da086c56660bcb7884a2ae380aef80159c9fa45d69626e1450182bdf6e98ad` | 870 |
+| 33 | User 4 | GD5V...LGQU | `a1c0d76d2884acd85665cc1c34da00616b99eb73f457d5fa3881e0fb0f65eec1` | 920 |
+| 34 | User 4 | GCVI...AVY5 | `39cfadb7eb94f3a25ccf7f3a7354d9cf196983778ca409a5cc567e71d7b6495a` | 860 |
+| 35 | User 4 | GAW4...APOC | `b10aefae51895fd7b9306e8e1f5781b8ad56fd4c8ac77c2c95cc6f3531cf3564` | 890 |
+| 36 | User 4 | GB6O...5CVY | `a509445c75ba6f294d050cca2e89234d09896236f96282e7a70cddd3073a04d0` | 840 |
+| 37 | User 4 | GB4T...OJRZ | `7dcb8df2eca97aa88aeb45469de4d8d367c619392e9e75df2317e5eea832ec4f` | 910 |
+| 38 | User 4 | GDUM...ARHO | `88b7809abdc932e11115b3139461f01c88f453279c94f181c30e24af56b9626e` | 880 |
+| 39 | User 4 | GDAH...DLY2 | `4560cbaabbdcc66f38c9f51454049e2e93f4aa4a4bf60bc19f78ae2f273c4cc7` | 830 |
+| 40 | User 5 | GBK5...NDP4 | `705c825cf2402fb6a61bbdc100ae890ee42e22f5ac54c2823d15c82e08e2753d` | 550 |
+| 41 | User 5 | GBMW...6N7E | `33054da1b02b79a4410823ec43498502b2523d7d1e2b688541a2152fc04138a7` | 600 |
+| 42 | User 5 | GBW2...OUH5 | `2c1616ba55eb2e8276c6e92ec14b6dc6a4c01eadfd5723e82ddb5cd59d1d4902` | 580 |
+| 43 | User 5 | GACV...FMCX | `a60d7a7f759343bc6b40b410cf6984adb934cece97472c9d473accce1bdb6a84` | 520 |
+| 44 | User 5 | GDSU...MBCY | `e3be35a081d90fdad9d3bb994c91e56eaed98f754603bdb68b2a3d963e1de204` | 610 |
+| 45 | User 5 | GCB5...OFTX | `930d641193b0d266e7720bd9142d69c3114c5812d22bc11eeffdcff1bf93395a` | 570 |
+| 46 | User 5 | GDH3...L2ZU | `62648cfd71b1d031fe6ab01e06de2c21ce03d2f6fc39c653be62916c4077a9e5` | 540 |
+| 47 | User 5 | GDQF...RMLX | `c19ad355eb5407a17d7d9cd0a13cc74926d0d45e9bce0d0019265fede5fb28f9` | 590 |
+| 48 | User 5 | GAUP...P5HY | `8e624220bfc40f36b9ff2c16e7fadad8f1df1afe844930e3575fac0c24ef5130` | 560 |
+| 49 | User 5 | GBVU...FMLT | `938f5217d519c0980c461bf1adf9fd379e727d55e5fd3be55636754b72cc51cc` | 530 |
 
 ### Active Usage Proof
 
