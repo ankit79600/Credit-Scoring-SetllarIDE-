@@ -6,6 +6,9 @@ import {
   getScores,
   getEvaluatorCount,
   getAverageScore,
+  getAverageScoreIfThreshold,
+  hasEvaluator,
+  removeScore,
   CONTRACT_ADDRESS,
 } from "@/hooks/contract";
 import { trackContractInteraction } from "@/lib/posthog";
@@ -301,10 +304,18 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
   const [lookupData, setLookupData] = useState<{
     evaluatorCount: number;
     averageScore: number;
+    trustedScore: number;
     minScore: number;
     maxScore: number;
     scores: ScoreEntry[];
   } | null>(null);
+
+  // Submit — has_evaluator check
+  const [alreadyEvaluated, setAlreadyEvaluated] = useState(false);
+  const [isCheckingEvaluator, setIsCheckingEvaluator] = useState(false);
+
+  // History — remove score
+  const [removingEvaluator, setRemovingEvaluator] = useState<string | null>(null);
 
   // History state
   const [historyUser, setHistoryUser] = useState("");
@@ -337,16 +348,18 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
     setIsLookingUp(true);
     setLookupData(null);
     try {
-      const [countResult, avgResult, scoresResult] = await Promise.all([
+      const [countResult, avgResult, scoresResult, trustedResult] = await Promise.all([
         getEvaluatorCount(address, walletAddress || undefined),
         getAverageScore(address, walletAddress || undefined),
         getScores(address, walletAddress || undefined),
+        getAverageScoreIfThreshold(address, 3, walletAddress || undefined),
       ]);
       const entries = (scoresResult ?? []) as ScoreEntry[];
       const scoreValues = entries.map((e) => e.score);
       setLookupData({
         evaluatorCount: countResult ?? 0,
         averageScore: avgResult ?? 0,
+        trustedScore: trustedResult ?? 0,
         minScore: scoreValues.length ? Math.min(...scoreValues) : 0,
         maxScore: scoreValues.length ? Math.max(...scoreValues) : 0,
         scores: entries,
@@ -383,6 +396,22 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
     if (!lookupUser.trim()) return setError("Enter a user address");
     await performLookup(lookupUser.trim());
   }, [lookupUser, performLookup]);
+
+  // ── has_evaluator check when submit address changes ───────
+
+  useEffect(() => {
+    if (!walletAddress || !submitUser.trim() || !submitUser.startsWith("G")) {
+      setAlreadyEvaluated(false);
+      return;
+    }
+    let cancelled = false;
+    setIsCheckingEvaluator(true);
+    hasEvaluator(submitUser.trim(), walletAddress, walletAddress)
+      .then((result) => { if (!cancelled) setAlreadyEvaluated(!!result); })
+      .catch(() => { if (!cancelled) setAlreadyEvaluated(false); })
+      .finally(() => { if (!cancelled) setIsCheckingEvaluator(false); });
+    return () => { cancelled = true; };
+  }, [submitUser, walletAddress]);
 
   // ── Submit ────────────────────────────────────────────────
 
@@ -430,6 +459,23 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
       setIsGettingHistory(false);
     }
   }, [historyUser, walletAddress]);
+
+  // ── Remove score ─────────────────────────────────────────
+
+  const handleRemoveScore = useCallback(async (targetUser: string, evaluatorAddr: string) => {
+    if (!walletAddress) return setError("Connect wallet first");
+    setRemovingEvaluator(evaluatorAddr);
+    setError(null);
+    try {
+      await removeScore(walletAddress, targetUser, evaluatorAddr);
+      setHistoryData((prev) => prev ? prev.filter((e) => e.evaluator !== evaluatorAddr) : prev);
+      trackContractInteraction("remove_score", {});
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Remove failed");
+    } finally {
+      setRemovingEvaluator(null);
+    }
+  }, [walletAddress]);
 
   // ── Share current lookup ──────────────────────────────────
 
@@ -583,7 +629,7 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
     }
   }, []);
 
-  const meetsThreshold = lookupData ? lookupData.evaluatorCount >= 3 : false;
+  const meetsThreshold = lookupData ? lookupData.trustedScore > 0 : false;
 
   return (
     <div className="w-full animate-fade-in-up-delayed">
@@ -807,7 +853,13 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
                         <div className="text-2xl font-bold text-white/90">{lookupData.evaluatorCount}</div>
                         <div className="text-[10px] text-white/25 mt-1 uppercase tracking-wider">Evaluators</div>
                       </div>
-                      <div className="rounded-xl border border-white/[0.07] bg-[#0d0d0d] p-4 text-center">
+                      <div className="rounded-xl border border-white/[0.07] bg-[#0d0d0d] p-4 text-center relative">
+                        {meetsThreshold && (
+                          <span className="absolute -top-2 left-1/2 -translate-x-1/2 flex items-center gap-1 rounded-full border border-[#34d399]/30 bg-[#34d399]/10 px-2 py-0.5 text-[8px] font-mono uppercase tracking-wider text-[#34d399]">
+                            <span className="h-1 w-1 rounded-full bg-[#34d399]" />
+                            Trusted
+                          </span>
+                        )}
                         {(() => {
                           const cfg = getScoreConfig(lookupData.averageScore);
                           return (
@@ -1051,9 +1103,17 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
                 })()}
 
                 {walletAddress ? (
-                  <ShimmerButton onClick={handleSubmitScore} disabled={isSubmitting} shimmerColor="#7c6cf0" className="w-full">
-                    {isSubmitting ? <><SpinnerIcon /> Submitting...</> : <><StarIcon /> Submit Score</>}
-                  </ShimmerButton>
+                  <div className="space-y-2">
+                    {alreadyEvaluated && (
+                      <div className="flex items-center gap-2 rounded-lg border border-[#fbbf24]/20 bg-[#fbbf24]/[0.05] px-3 py-2 text-xs text-[#fbbf24]/70">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        You already rated this address — submitting will update your score
+                      </div>
+                    )}
+                    <ShimmerButton onClick={handleSubmitScore} disabled={isSubmitting || isCheckingEvaluator} shimmerColor="#7c6cf0" className="w-full">
+                      {isSubmitting ? <><SpinnerIcon /> Submitting...</> : isCheckingEvaluator ? <><SpinnerIcon /> Checking...</> : alreadyEvaluated ? <><StarIcon /> Update Score</> : <><StarIcon /> Submit Score</>}
+                    </ShimmerButton>
+                  </div>
                 ) : (
                   <button
                     onClick={async () => {
@@ -1197,9 +1257,19 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
                                 </div>
                               </div>
                             </div>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-3">
                               <span className={cn("font-mono text-sm font-bold", cfg.color)}>{entry.score}</span>
                               <div className={cn("h-1.5 w-1.5 rounded-full", cfg.bg)} />
+                              {walletAddress && entry.evaluator === walletAddress && (
+                                <button
+                                  onClick={() => handleRemoveScore(historyUser.trim(), entry.evaluator)}
+                                  disabled={removingEvaluator === entry.evaluator}
+                                  className="flex items-center gap-1 rounded border border-[#f87171]/20 bg-[#f87171]/[0.05] px-2 py-0.5 text-[9px] text-[#f87171]/60 hover:bg-[#f87171]/10 hover:text-[#f87171] transition-colors disabled:opacity-40"
+                                  title="Remove your score"
+                                >
+                                  {removingEvaluator === entry.evaluator ? <SpinnerIcon /> : "Remove"}
+                                </button>
+                              )}
                             </div>
                           </div>
                         );
