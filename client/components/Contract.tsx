@@ -528,10 +528,43 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const tabs: { key: Tab; label: string; color: string }[] = [
-    { key: "lookup", label: "Lookup", color: "#4fc3f7" },
-    { key: "submit", label: "Submit", color: "#7c6cf0" },
-    { key: "history", label: "History", color: "#fbbf24" },
+  const tabs: { key: Tab; label: string; desc: string; color: string; icon: React.ReactNode; num: string }[] = [
+    {
+      key: "lookup",
+      label: "Lookup",
+      desc: "Query any address",
+      color: "#4fc3f7",
+      num: "01",
+      icon: (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" />
+        </svg>
+      ),
+    },
+    {
+      key: "submit",
+      label: "Submit",
+      desc: "Rate a wallet",
+      color: "#7c6cf0",
+      num: "02",
+      icon: (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+        </svg>
+      ),
+    },
+    {
+      key: "history",
+      label: "History",
+      desc: "Past evaluations",
+      color: "#fbbf24",
+      num: "03",
+      icon: (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
+        </svg>
+      ),
+    },
   ];
 
   const handleTabKeyDown = useCallback((e: React.KeyboardEvent, currentKey: Tab) => {
@@ -620,30 +653,59 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
           </div>
 
           {/* Tabs */}
-          <div className="flex border-b border-white/[0.06]">
-            {tabs.map((t) => (
-              <button
-                key={t.key}
-                role="tab"
-                aria-selected={activeTab === t.key}
-                tabIndex={activeTab === t.key ? 0 : -1}
-                onClick={() => { setActiveTab(t.key); setError(null); setLookupData(null); setHistoryData(null); }}
-                onKeyDown={(e) => handleTabKeyDown(e, t.key)}
-                className={cn(
-                  "relative px-6 py-3.5 text-[11px] font-semibold uppercase tracking-widest transition-all",
-                  activeTab === t.key ? "text-white/90" : "text-white/30 hover:text-white/55"
-                )}
-                style={activeTab === t.key ? { color: t.color } : undefined}
-              >
-                {t.label}
-                {activeTab === t.key && (
+          <div className="grid grid-cols-3 gap-3 border-b border-white/[0.06] px-6 py-4">
+            {tabs.map((t) => {
+              const isActive = activeTab === t.key;
+              return (
+                <button
+                  key={t.key}
+                  role="tab"
+                  aria-selected={isActive}
+                  tabIndex={isActive ? 0 : -1}
+                  onClick={() => { setActiveTab(t.key); setError(null); setLookupData(null); setHistoryData(null); }}
+                  onKeyDown={(e) => handleTabKeyDown(e, t.key)}
+                  className={cn(
+                    "relative flex flex-col items-center gap-2 rounded-xl border px-4 py-4 text-center transition-all duration-200",
+                    isActive
+                      ? "border-white/[0.12] bg-[#0d0d0d]"
+                      : "border-white/[0.04] bg-transparent hover:border-white/[0.08] hover:bg-white/[0.02]"
+                  )}
+                  style={isActive ? { borderColor: `${t.color}30`, boxShadow: `0 0 20px ${t.color}10` } : undefined}
+                >
+                  {/* Number badge */}
                   <span
-                    className="absolute bottom-0 left-3 right-3 h-[1.5px] rounded-full"
-                    style={{ background: t.color }}
-                  />
-                )}
-              </button>
-            ))}
+                    className="absolute right-2.5 top-2.5 text-[9px] font-mono tracking-wider"
+                    style={{ color: isActive ? t.color : "rgba(255,255,255,0.15)" }}
+                  >
+                    {t.num}
+                  </span>
+
+                  {/* Icon */}
+                  <span style={{ color: isActive ? t.color : "rgba(255,255,255,0.25)" }}>
+                    {t.icon}
+                  </span>
+
+                  {/* Label */}
+                  <div>
+                    <p
+                      className="text-[11px] font-semibold uppercase tracking-widest"
+                      style={{ color: isActive ? t.color : "rgba(255,255,255,0.35)" }}
+                    >
+                      {t.label}
+                    </p>
+                    <p className="mt-0.5 text-[9px] text-white/20 tracking-wide">{t.desc}</p>
+                  </div>
+
+                  {/* Active bottom line */}
+                  {isActive && (
+                    <span
+                      className="absolute bottom-0 left-4 right-4 h-[1.5px] rounded-full"
+                      style={{ background: t.color }}
+                    />
+                  )}
+                </button>
+              );
+            })}
           </div>
 
           {/* Tab Content */}
