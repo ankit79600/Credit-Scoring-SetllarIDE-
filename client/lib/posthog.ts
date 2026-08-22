@@ -36,7 +36,7 @@ export function trackWalletDisconnect() {
 }
 
 export function trackContractInteraction(
-  action: "submit_score" | "lookup_score" | "get_history",
+  action: "submit_score" | "lookup_score" | "get_history" | "remove_score",
   meta?: Record<string, unknown>
 ) {
   posthog.capture(`contract_${action}`, meta ?? {});

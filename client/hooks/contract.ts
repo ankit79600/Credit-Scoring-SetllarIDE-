@@ -348,15 +348,17 @@ export async function getAverageScoreIfThreshold(
  * Calls: remove_score(user: Address, evaluator: Address)
  */
 export async function removeScore(
-  evaluator: string,
+  caller: string,
   user: string,
   evaluatorAddr: string
-) {
-  return writeContract(
+): Promise<string> {
+  const res = await callContract(
     "remove_score",
     [toScValAddress(user), toScValAddress(evaluatorAddr)],
-    evaluator
-  );
+    caller,
+    true
+  ) as { txHash: string };
+  return res.txHash;
 }
 
 export { nativeToScVal, scValToNative, Address, xdr };
