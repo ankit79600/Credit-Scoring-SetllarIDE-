@@ -6,8 +6,6 @@ import {
   getScores,
   getEvaluatorCount,
   getAverageScore,
-  getMinScore,
-  getMaxScore,
   CONTRACT_ADDRESS,
 } from "@/hooks/contract";
 import { trackContractInteraction } from "@/lib/posthog";
@@ -339,19 +337,19 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
     setIsLookingUp(true);
     setLookupData(null);
     try {
-      const [countResult, avgResult, scoresResult, minResult, maxResult] = await Promise.all([
+      const [countResult, avgResult, scoresResult] = await Promise.all([
         getEvaluatorCount(address, walletAddress || undefined),
         getAverageScore(address, walletAddress || undefined),
         getScores(address, walletAddress || undefined),
-        getMinScore(address, walletAddress || undefined),
-        getMaxScore(address, walletAddress || undefined),
       ]);
+      const entries = (scoresResult ?? []) as ScoreEntry[];
+      const scoreValues = entries.map((e) => e.score);
       setLookupData({
         evaluatorCount: countResult ?? 0,
         averageScore: avgResult ?? 0,
-        minScore: minResult ?? 0,
-        maxScore: maxResult ?? 0,
-        scores: (scoresResult ?? []) as ScoreEntry[],
+        minScore: scoreValues.length ? Math.min(...scoreValues) : 0,
+        maxScore: scoreValues.length ? Math.max(...scoreValues) : 0,
+        scores: entries,
       });
       trackContractInteraction("lookup_score", { evaluator_count: countResult ?? 0 });
       // Sync URL so this lookup is shareable
