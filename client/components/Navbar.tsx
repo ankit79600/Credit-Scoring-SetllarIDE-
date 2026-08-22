@@ -75,8 +75,8 @@ export default function Navbar({
   const truncate = (addr: string) => `${addr.slice(0, 4)}...${addr.slice(-4)}`;
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b border-white/[0.06] bg-[#0d0d0d] animate-fade-in-down">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
+    <nav className="sticky top-0 z-50 w-full border-b border-white/[0.06] bg-[#0a0a0f] animate-fade-in-down">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 lg:px-10 py-3">
         {/* Logo */}
         <div className="flex items-center gap-3">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#7c6cf0]/30 bg-[#7c6cf0]/10">
@@ -94,12 +94,43 @@ export default function Navbar({
           </div>
         </div>
 
+        {/* Nav links */}
+        <div className="hidden md:flex items-center gap-1">
+          {[
+            { label: "Platform", href: "#" },
+            { label: "How It Works", onClick: onOpenGuide },
+            { label: "Developers", href: "https://developers.stellar.org/docs/smart-contracts" },
+            { label: "GitHub", href: "https://github.com/ankit79600/My-Credit-Scoring" },
+          ].map((item) =>
+            item.href ? (
+              <a
+                key={item.label}
+                href={item.href}
+                target={item.href.startsWith("http") ? "_blank" : undefined}
+                rel="noopener noreferrer"
+                className="px-3 py-1.5 text-[12px] text-white/35 hover:text-white/70 transition-colors"
+              >
+                {item.label}
+              </a>
+            ) : (
+              <button
+                key={item.label}
+                onClick={item.onClick}
+                className="px-3 py-1.5 text-[12px] text-white/35 hover:text-white/70 transition-colors"
+              >
+                {item.label}
+              </button>
+            )
+          )}
+        </div>
+
         {/* Right side */}
         <div className="flex items-center gap-2 sm:gap-3">
+          {/* Guide — mobile only */}
           {onOpenGuide && (
             <button
               onClick={onOpenGuide}
-              className="hidden sm:flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-white/30 hover:text-white/60 transition-colors px-2 py-1.5"
+              className="flex md:hidden items-center gap-1.5 text-[11px] uppercase tracking-wider text-white/30 hover:text-white/60 transition-colors px-2 py-1.5"
             >
               Guide
             </button>

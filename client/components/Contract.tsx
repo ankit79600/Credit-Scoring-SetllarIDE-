@@ -586,7 +586,7 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
   const meetsThreshold = lookupData ? lookupData.evaluatorCount >= 3 : false;
 
   return (
-    <div className="w-full max-w-2xl animate-fade-in-up-delayed">
+    <div className="w-full animate-fade-in-up-delayed">
       {/* Toasts */}
       {error && (
         <div className="mb-4 flex items-start gap-3 rounded-xl border border-[#f87171]/15 bg-[#f87171]/[0.05] px-4 py-3 backdrop-blur-sm animate-slide-down">
@@ -632,23 +632,26 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
         <AnimatedCard className="p-0" containerClassName="rounded-2xl">
           {/* Header */}
           <div className="flex items-center justify-between border-b border-white/[0.06] px-6 py-4">
-            <div className="flex items-center gap-3">
-              <div>
-                <h3 className="text-[11px] font-semibold uppercase tracking-widest text-white/70">Credit Scoring System</h3>
-                <button
-                  onClick={() => copyToClipboard(CONTRACT_ADDRESS)}
-                  className="flex items-center gap-1.5 text-[9px] text-white/20 font-mono mt-0.5 hover:text-white/45 transition-colors group"
-                  title="Copy contract address"
-                >
-                  {truncate(CONTRACT_ADDRESS)}
-                  <span className="opacity-0 group-hover:opacity-100 transition-opacity">
-                    <CopyIcon copied={copiedAddr === CONTRACT_ADDRESS} />
-                  </span>
-                </button>
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-[9px] font-mono uppercase tracking-[0.2em] text-white/25">Contract Node #001</span>
+                <span className="text-[9px] text-white/10">·</span>
+                <span className="text-[9px] font-mono text-white/20">Soroban Smart Contract</span>
               </div>
+              <button
+                onClick={() => copyToClipboard(CONTRACT_ADDRESS)}
+                className="flex items-center gap-1.5 text-[11px] font-semibold text-white/70 font-mono hover:text-white/90 transition-colors group"
+                title="Copy contract address"
+              >
+                {truncate(CONTRACT_ADDRESS)}
+                <span className="opacity-0 group-hover:opacity-100 transition-opacity text-white/30">
+                  <CopyIcon copied={copiedAddr === CONTRACT_ADDRESS} />
+                </span>
+              </button>
             </div>
-            <div className="flex items-center gap-1.5 rounded border border-[#7c6cf0]/20 bg-[#7c6cf0]/[0.05] px-2.5 py-1 text-[9px] font-mono uppercase tracking-wider text-[#7c6cf0]/60">
-              Soroban
+            <div className="flex items-center gap-1.5 rounded-full border border-[#34d399]/20 bg-[#34d399]/[0.05] px-3 py-1 text-[9px] font-mono uppercase tracking-wider text-[#34d399]/70">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#34d399] animate-pulse" />
+              Network active
             </div>
           </div>
 
