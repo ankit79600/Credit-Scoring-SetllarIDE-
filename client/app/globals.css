@@ -98,6 +98,81 @@ body {
   animation: pulse-ring 2s ease-out infinite;
 }
 
+/* ── Glassmorphism ── */
+
+.glass {
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-md {
+  backdrop-filter: blur(32px) saturate(180%);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.glass-heavy {
+  backdrop-filter: blur(48px) saturate(200%);
+  -webkit-backdrop-filter: blur(48px) saturate(200%);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+/* ── Gradient text ── */
+
+.gradient-text {
+  background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.55) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-purple {
+  background: linear-gradient(135deg, #a78bfa 0%, #7c6cf0 40%, #4fc3f7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Blob / orb ── */
+
+@keyframes blob {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(40px, -60px) scale(1.12); }
+  66% { transform: translate(-30px, 30px) scale(0.92); }
+}
+
+.animate-blob { animation: blob 9s ease-in-out infinite; }
+.animate-blob-delayed { animation: blob 11s ease-in-out 3s infinite; }
+.animate-blob-delayed-2 { animation: blob 13s ease-in-out 6s infinite; }
+
+/* ── Gentle float (hero card) ── */
+
+@keyframes float-gentle {
+  0%, 100% { transform: translateY(0px) rotateX(4deg) rotateY(-8deg); }
+  50% { transform: translateY(-14px) rotateX(4deg) rotateY(-8deg); }
+}
+.animate-float-gentle { animation: float-gentle 5s ease-in-out infinite; }
+
+/* ── Shine sweep (card highlight) ── */
+
+@keyframes shine-sweep {
+  0% { transform: translateX(-100%) skewX(-20deg); }
+  100% { transform: translateX(300%) skewX(-20deg); }
+}
+.animate-shine { animation: shine-sweep 4s ease-in-out infinite 1.5s; }
+
+/* ── Glow pulse ── */
+
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.15; transform: scale(1); }
+  50% { opacity: 0.25; transform: scale(1.08); }
+}
+.animate-glow-pulse { animation: glow-pulse 3s ease-in-out infinite; }
+
 /* ── Custom scrollbar ── */
 
 ::-webkit-scrollbar { width: 6px; }
