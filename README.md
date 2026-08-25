@@ -231,6 +231,48 @@ New users see a 5-step guided modal on first visit:
 
 The modal state is persisted in `localStorage` so it only appears once. Users can reopen it anytime via the Guide button in the navbar.
 
+## User Registration & Feedback Collection
+
+### Google Form — User Onboarding Registration
+
+> **Form URL:** [forms.gle/6hdSkpKgnYBqzp7J6](https://forms.gle/6hdSkpKgnYBqzp7J6)
+
+The form collects the following fields from every onboarded user:
+
+| Field | Type | Purpose |
+|---|---|---|
+| **Full Name** | Short text | User identification |
+| **Email Address** | Email | Follow-up and record-keeping |
+| **Stellar Public Address** | Short text (G...) | Proof of testnet wallet |
+| **Transaction Hash / Proof of Interaction** | Short text | Verifiable on-chain activity proof |
+| **How easy was it to connect your wallet and use the app?** | Scale / Short text | UX ease rating |
+| **Suggestions for Improvement** | Long text | Qualitative product feedback |
+
+### Exported Responses (Excel / CSV)
+
+All responses have been exported and are available here:
+
+📊 **[docs/user-feedback-responses.csv](./docs/user-feedback-responses.csv)** — CSV file in this repository  
+📊 **[View on Google Sheets](https://docs.google.com/spreadsheets/d/1allhjDi6S8tDs_yakwVZTq5BZdmI6n8WtePXurGq-h0/edit?usp=sharing)** — Live Google Sheets view
+
+**Response Summary:**
+
+| Metric | Value |
+|---|---|
+| Total responses | 50+ |
+| Unique wallet addresses | 50+ |
+| Verified transaction hashes | 50+ |
+| Date range | July 14 – July 20, 2026 |
+
+## In-App Feedback Widget
+
+A persistent floating feedback button appears in the bottom-right corner (`FeedbackModal.tsx`). Users can:
+- Rate the app 1–5 stars (emoji scale)
+- Leave a text comment (optional)
+- Provide their email (optional)
+
+Responses are tracked as `feedback_submitted` events in PostHog. After submitting, the form dismisses and a thank-you message is shown.
+
 ## User Feedback & Iterations
 
 After collecting 52 responses (average rating 4.4/5), the following improvements were shipped based on user feedback:
