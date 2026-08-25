@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@1.81
+        uses: dtolnay/rust-toolchain@1.82
         with:
           targets: wasm32v1-none
 
@@ -30,8 +30,8 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             contract/target
-          key: ${{ runner.os }}-cargo-1.81-${{ hashFiles('contract/Cargo.lock') }}
-          restore-keys: ${{ runner.os }}-cargo-1.81-
+          key: ${{ runner.os }}-cargo-1.82-${{ hashFiles('contract/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-1.82-
 
       - name: Check contract compiles
         run: cargo check
