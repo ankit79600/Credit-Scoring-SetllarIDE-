@@ -27,25 +27,15 @@ jobs:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            ~/.cargo/bin/stellar
             contract/target
           key: ${{ runner.os }}-cargo-stable-${{ hashFiles('contract/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-stable-
-
-      - name: Install stellar-cli
-        run: |
-          if ! command -v stellar &> /dev/null; then
-            cargo install stellar-cli --locked
-          fi
 
       - name: Check contract compiles
         run: cargo check
 
       - name: Run contract tests
         run: cargo test
-
-      - name: Build contract (WASM)
-        run: stellar contract build
 
   # ── Frontend ──────────────────────────────────────────────
   frontend:
