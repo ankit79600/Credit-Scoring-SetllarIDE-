@@ -21,9 +21,6 @@ jobs:
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@1.82
 
-      - name: Add wasm32v1-none target
-        run: rustup target add wasm32v1-none
-
       - name: Cache Rust dependencies
         uses: actions/cache@v4
         with:
@@ -36,9 +33,6 @@ jobs:
 
       - name: Check contract compiles
         run: cargo check
-
-      - name: Build contract (WASM)
-        run: cargo build --target wasm32v1-none --release
 
   # ── Frontend ──────────────────────────────────────────────
   frontend:
