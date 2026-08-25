@@ -59,6 +59,9 @@ fn test_update_score_same_evaluator() {
     let evaluator = Address::generate(&env);
 
     client.submit_score(&user, &700, &evaluator);
+
+    // advance past 24h cooldown
+    env.ledger().with_mut(|l| l.timestamp = 86_401);
     client.submit_score(&user, &800, &evaluator);
 
     let scores = client.get_scores(&user);
@@ -229,4 +232,212 @@ fn test_timestamp_recorded() {
     assert_eq!(scores.len(), 1);
     // Default test env timestamp is 0
     assert_eq!(scores.get(0).unwrap().timestamp, 0);
+}
+
+#[test]
+fn test_boundary_score_zero() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let contract_id = env.register(Contract, ());
+    let client = ContractClient::new(&env, &contract_id);
+
+    let user = Address::generate(&env);
+    let evaluator = Address::generate(&env);
+
+    client.submit_score(&user, &0, &evaluator);
+    assert_eq!(client.get_average_score(&user), 0);
+    assert_eq!(client.get_min_score(&user), 0);
+    assert_eq!(client.get_max_score(&user), 0);
+}
+
+#[test]
+fn test_boundary_score_max() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let contract_id = env.register(Contract, ());
+    let client = ContractClient::new(&env, &contract_id);
+
+    let user = Address::generate(&env);
+    let evaluator = Address::generate(&env);
+
+    client.submit_score(&user, &1000, &evaluator);
+    assert_eq!(client.get_average_score(&user), 1000);
+    assert_eq!(client.get_min_score(&user), 1000);
+    assert_eq!(client.get_max_score(&user), 1000);
+}
+
+#[test]
+#[should_panic]
+fn test_score_above_max_panics() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let contract_id = env.register(Contract, ());
+    let client = ContractClient::new(&env, &contract_id);
+
+    let user = Address::generate(&env);
+    let evaluator = Address::generate(&env);
+
+    client.submit_score(&user, &1001, &evaluator);
+}
+
+#[test]
+fn test_remove_then_resubmit() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let contract_id = env.register(Contract, ());
+    let client = ContractClient::new(&env, &contract_id);
+
+    let user = Address::generate(&env);
+    let evaluator = Address::generate(&env);
+
+    client.submit_score(&user, &700, &evaluator);
+    assert_eq!(client.get_evaluator_count(&user), 1);
+
+    client.remove_score(&user, &evaluator);
+    assert_eq!(client.get_evaluator_count(&user), 0);
+    assert!(!client.has_evaluator(&user, &evaluator));
+
+    client.submit_score(&user, &800, &evaluator);
+    assert_eq!(client.get_evaluator_count(&user), 1);
+    assert!(client.has_evaluator(&user, &evaluator));
+    assert_eq!(client.get_average_score(&user), 800);
+}
+
+#[test]
+fn test_remove_nonexistent_is_noop() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let contract_id = env.register(Contract, ());
+    let client = ContractClient::new(&env, &contract_id);
+
+    let user = Address::generate(&env);
+    let evaluator = Address::generate(&env);
+    let other = Address::generate(&env);
+
+    client.submit_score(&user, &700, &evaluator);
+    // removing a non-existent evaluator should not change the list
+    client.remove_score(&user, &other);
+    assert_eq!(client.get_evaluator_count(&user), 1);
+    assert_eq!(client.get_average_score(&user), 700);
+}
+
+#[test]
+fn test_independent_users() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let contract_id = env.register(Contract, ());
+    let client = ContractClient::new(&env, &contract_id);
+
+    let user1 = Address::generate(&env);
+    let user2 = Address::generate(&env);
+    let evaluator = Address::generate(&env);
+
+    client.submit_score(&user1, &600, &evaluator);
+    client.submit_score(&user2, &900, &evaluator);
+
+    assert_eq!(client.get_average_score(&user1), 600);
+    assert_eq!(client.get_average_score(&user2), 900);
+    assert_eq!(client.get_evaluator_count(&user1), 1);
+    assert_eq!(client.get_evaluator_count(&user2), 1);
+}
+
+#[test]
+fn test_update_does_not_add_evaluator() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let contract_id = env.register(Contract, ());
+    let client = ContractClient::new(&env, &contract_id);
+
+    let user = Address::generate(&env);
+    let evaluator = Address::generate(&env);
+
+    client.submit_score(&user, &500, &evaluator);
+    env.ledger().with_mut(|l| l.timestamp = 86_401);
+    client.submit_score(&user, &600, &evaluator);
+    env.ledger().with_mut(|l| l.timestamp = 172_802);
+    client.submit_score(&user, &700, &evaluator);
+
+    // three updates from same evaluator — count stays at 1
+    assert_eq!(client.get_evaluator_count(&user), 1);
+    assert_eq!(client.get_average_score(&user), 700);
+}
+
+#[test]
+fn test_threshold_zero_always_returns_average() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let contract_id = env.register(Contract, ());
+    let client = ContractClient::new(&env, &contract_id);
+
+    let user = Address::generate(&env);
+    let evaluator = Address::generate(&env);
+
+    client.submit_score(&user, &500, &evaluator);
+    // threshold of 0 — 1 evaluator meets it
+    let avg = client.get_average_score_if_threshold(&user, &0);
+    assert_eq!(avg, 500);
+}
+
+#[test]
+#[should_panic(expected = "cooldown")]
+fn test_cooldown_blocks_rapid_update() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let contract_id = env.register(Contract, ());
+    let client = ContractClient::new(&env, &contract_id);
+
+    let user = Address::generate(&env);
+    let evaluator = Address::generate(&env);
+
+    client.submit_score(&user, &700, &evaluator);
+    // same timestamp — should panic with cooldown message
+    client.submit_score(&user, &800, &evaluator);
+}
+
+#[test]
+fn test_initialize_sets_admin() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let contract_id = env.register(Contract, ());
+    let client = ContractClient::new(&env, &contract_id);
+
+    let admin = Address::generate(&env);
+    // should succeed without panicking
+    client.initialize(&admin);
+}
+
+#[test]
+#[should_panic(expected = "already initialized")]
+fn test_double_initialize_panics() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let contract_id = env.register(Contract, ());
+    let client = ContractClient::new(&env, &contract_id);
+
+    let admin = Address::generate(&env);
+    client.initialize(&admin);
+    client.initialize(&admin);
+}
+
+#[test]
+fn test_min_max_after_update() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let contract_id = env.register(Contract, ());
+    let client = ContractClient::new(&env, &contract_id);
+
+    let user = Address::generate(&env);
+    let e1 = Address::generate(&env);
+    let e2 = Address::generate(&env);
+
+    client.submit_score(&user, &200, &e1);
+    client.submit_score(&user, &800, &e2);
+    assert_eq!(client.get_min_score(&user), 200);
+    assert_eq!(client.get_max_score(&user), 800);
+
+    // e1 updates to 900 after cooldown — new min should be 800, max 900
+    env.ledger().with_mut(|l| l.timestamp = 86_401);
+    client.submit_score(&user, &900, &e1);
+    assert_eq!(client.get_min_score(&user), 800);
+    assert_eq!(client.get_max_score(&user), 900);
 }

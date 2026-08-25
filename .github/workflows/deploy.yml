@@ -23,9 +23,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@1.81
-        with:
-          targets: wasm32v1-none
+        uses: dtolnay/rust-toolchain@stable
 
       - name: Cache Rust dependencies
         uses: actions/cache@v4
@@ -33,21 +31,25 @@ jobs:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
+            ~/.cargo/bin/stellar
             contract/target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('contract/Cargo.lock') }}
-          restore-keys: ${{ runner.os }}-cargo-
+          key: ${{ runner.os }}-deploy-stable-${{ hashFiles('contract/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-deploy-stable-
 
       - name: Install Stellar CLI
-        run: cargo install stellar-cli --features opt --locked
+        run: |
+          if ! command -v stellar &> /dev/null; then
+            cargo install stellar-cli --locked
+          fi
 
       - name: Build contract (WASM)
-        run: cargo build --target wasm32v1-none --release
+        run: stellar contract build
 
       - name: Deploy contract to Testnet
+        env:
+          STELLAR_SECRET_KEY: ${{ secrets.STELLAR_SECRET_KEY }}
         run: |
           stellar contract deploy \
             --wasm target/wasm32v1-none/release/contract.wasm \
             --network testnet \
-            --source-account ${{ secrets.STELLAR_SECRET_KEY }}
-        env:
-          STELLAR_SECRET_KEY: ${{ secrets.STELLAR_SECRET_KEY }}
+            --source-account "$STELLAR_SECRET_KEY"

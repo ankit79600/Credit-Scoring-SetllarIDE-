@@ -1,5 +1,5 @@
 #![no_std]
-use soroban_sdk::{contract, contractimpl, contracttype, Address, Env, Vec};
+use soroban_sdk::{contract, contractimpl, contracttype, Address, BytesN, Env, Vec};
 
 #[contracttype]
 #[derive(Clone)]
@@ -12,18 +12,61 @@ pub struct ScoreEntry {
 #[contracttype]
 pub enum DataKey {
     Scores(Address),
+    Admin,
+    // last submission ledger timestamp for (user, evaluator) pair
+    LastSubmit(Address, Address),
 }
+
+// 24-hour cooldown between evaluator updates for the same user (in seconds)
+const COOLDOWN_SECONDS: u64 = 86_400;
 
 #[contract]
 pub struct Contract;
 
 #[contractimpl]
 impl Contract {
+    /// Set the contract admin. Must be called once after deployment.
+    /// The declared admin must co-sign this transaction, preventing an attacker
+    /// from front-running initialization with an address they don't control.
+    pub fn initialize(env: Env, admin: Address) {
+        assert!(
+            !env.storage().instance().has(&DataKey::Admin),
+            "already initialized"
+        );
+        admin.require_auth();
+        env.storage().instance().set(&DataKey::Admin, &admin);
+        env.storage().instance().extend_ttl(518_400, 1_555_200);
+    }
+
+    /// Upgrade the contract WASM. Only the admin can call this.
+    pub fn upgrade(env: Env, new_wasm_hash: BytesN<32>) {
+        let admin: Address = env
+            .storage()
+            .instance()
+            .get(&DataKey::Admin)
+            .expect("not initialized");
+        admin.require_auth();
+        env.deployer().update_current_contract_wasm(new_wasm_hash);
+    }
+
     /// Submit a credit score for a user. PERMISSIONLESS: anyone can evaluate anyone.
     /// If the same evaluator submits again, it updates the previous score.
+    /// Rate-limited: an evaluator must wait 24 h between updates for the same user.
     pub fn submit_score(env: Env, user: Address, score: u32, evaluator: Address) {
         evaluator.require_auth();
         assert!(score <= 1000, "score must be 0-1000");
+
+        let now = env.ledger().timestamp();
+
+        // enforce cooldown for re-submissions (first submission is always allowed)
+        let cooldown_key = DataKey::LastSubmit(user.clone(), evaluator.clone());
+        let last_opt: Option<u64> = env.storage().instance().get(&cooldown_key);
+        if let Some(last) = last_opt {
+            assert!(
+                now >= last + COOLDOWN_SECONDS,
+                "cooldown: wait 24h between score updates"
+            );
+        }
 
         let key = DataKey::Scores(user.clone());
         let mut scores: Vec<ScoreEntry> = env
@@ -32,7 +75,6 @@ impl Contract {
             .get(&key)
             .unwrap_or_else(|| Vec::new(&env));
 
-        let timestamp = env.ledger().timestamp();
         let mut found = false;
         for i in 0..scores.len() {
             if let Some(entry) = scores.get(i) {
@@ -42,7 +84,7 @@ impl Contract {
                         ScoreEntry {
                             evaluator: evaluator.clone(),
                             score,
-                            timestamp,
+                            timestamp: now,
                         },
                     );
                     found = true;
@@ -53,13 +95,14 @@ impl Contract {
 
         if !found {
             scores.push_back(ScoreEntry {
-                evaluator,
+                evaluator: evaluator.clone(),
                 score,
-                timestamp,
+                timestamp: now,
             });
         }
 
         env.storage().instance().set(&key, &scores);
+        env.storage().instance().set(&cooldown_key, &now);
         // Extend TTL: at least 30 days, up to 90 days (at ~5s per ledger)
         env.storage().instance().extend_ttl(518_400, 1_555_200);
     }

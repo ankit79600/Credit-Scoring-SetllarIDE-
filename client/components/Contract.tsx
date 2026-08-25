@@ -198,12 +198,12 @@ function MethodSignature({
 
 // ── Score Config ─────────────────────────────────────────────
 
-function getScoreConfig(score: number): { color: string; bg: string; label: string } {
-  if (score >= 800) return { color: "text-[#34d399]", bg: "bg-[#34d399]", label: "Excellent" };
-  if (score >= 700) return { color: "text-[#4fc3f7]", bg: "bg-[#4fc3f7]", label: "Good" };
-  if (score >= 600) return { color: "text-[#fbbf24]", bg: "bg-[#fbbf24]", label: "Fair" };
-  if (score >= 400) return { color: "text-[#fb923c]", bg: "bg-[#fb923c]", label: "Poor" };
-  return { color: "text-[#f87171]", bg: "bg-[#f87171]", label: "Very Poor" };
+function getScoreConfig(score: number): { color: string; bg: string; label: string; hex: string } {
+  if (score >= 800) return { color: "text-[#34d399]", bg: "bg-[#34d399]", label: "Excellent", hex: "#34d399" };
+  if (score >= 700) return { color: "text-[#4fc3f7]", bg: "bg-[#4fc3f7]", label: "Good",      hex: "#4fc3f7" };
+  if (score >= 600) return { color: "text-[#fbbf24]", bg: "bg-[#fbbf24]", label: "Fair",      hex: "#fbbf24" };
+  if (score >= 400) return { color: "text-[#fb923c]", bg: "bg-[#fb923c]", label: "Poor",      hex: "#fb923c" };
+  return             { color: "text-[#f87171]", bg: "bg-[#f87171]", label: "Very Poor",        hex: "#f87171" };
 }
 
 // ── Utilities ────────────────────────────────────────────────
@@ -264,6 +264,73 @@ function ScoreBarChart({ scores }: { scores: Array<{ score: number }> }) {
         <span className="text-[9px] text-white/20 font-mono">avg {avg}</span>
         <div className="h-px flex-1 bg-white/[0.04]" />
       </div>
+    </div>
+  );
+}
+
+// ── Score Timeline Chart ─────────────────────────────────────
+
+function ScoreTimelineChart({ scores }: { scores: Array<{ score: number; timestamp?: number | bigint }> }) {
+  const withTime = scores.filter((e) => e.timestamp != null);
+  if (withTime.length < 2) return null;
+
+  const sorted = [...withTime].sort((a, b) => Number(a.timestamp) - Number(b.timestamp));
+  const W = 360;
+  const H = 80;
+  const PAD = { top: 10, right: 12, bottom: 18, left: 28 };
+
+  const minTs = Number(sorted[0].timestamp);
+  const maxTs = Number(sorted[sorted.length - 1].timestamp);
+  const tsRange = maxTs - minTs || 1;
+
+  const toX = (ts: number) => PAD.left + ((ts - minTs) / tsRange) * (W - PAD.left - PAD.right);
+  const toY = (score: number) => PAD.top + (1 - score / 1000) * (H - PAD.top - PAD.bottom);
+
+  const points = sorted.map((e) => ({ x: toX(Number(e.timestamp)), y: toY(e.score), score: e.score }));
+  const polyline = points.map((p) => `${p.x},${p.y}`).join(" ");
+  const avg = Math.round(sorted.reduce((s, e) => s + e.score, 0) / sorted.length);
+  const avgY = toY(avg);
+
+  const fmtDate = (ts: number) => {
+    const d = new Date(ts * 1000);
+    return `${d.getMonth() + 1}/${d.getDate()}`;
+  };
+
+  return (
+    <div className="rounded-xl border border-white/[0.07] bg-[#0d0d0d] p-4">
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-[10px] font-medium uppercase tracking-wider text-white/25">Score Timeline</span>
+        <span className="text-[10px] text-white/25 font-mono">avg {avg}</span>
+      </div>
+      <svg viewBox={`0 0 ${W} ${H}`} className="w-full overflow-visible">
+        {/* Y-axis labels */}
+        {[0, 500, 1000].map((v) => (
+          <g key={v}>
+            <text x={PAD.left - 4} y={toY(v) + 3} textAnchor="end" fill="rgba(255,255,255,0.2)" fontSize="7" fontFamily="monospace">{v}</text>
+            <line x1={PAD.left} y1={toY(v)} x2={W - PAD.right} y2={toY(v)} stroke="rgba(255,255,255,0.04)" strokeWidth="0.5" />
+          </g>
+        ))}
+        {/* Avg line */}
+        <line x1={PAD.left} y1={avgY} x2={W - PAD.right} y2={avgY} stroke="rgba(255,255,255,0.12)" strokeWidth="0.8" strokeDasharray="3 3" />
+        {/* Polyline */}
+        <polyline points={polyline} fill="none" stroke="rgba(124,108,240,0.6)" strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round" />
+        {/* Dots + labels */}
+        {points.map((p, i) => {
+          const cfg = getScoreConfig(p.score);
+          return (
+            <g key={i}>
+              <circle cx={p.x} cy={p.y} r="3" fill={cfg.hex ?? "#7c6cf0"} opacity="0.9" />
+              <circle cx={p.x} cy={p.y} r="5" fill="transparent" stroke={cfg.hex ?? "#7c6cf0"} strokeWidth="0.8" opacity="0.4" />
+            </g>
+          );
+        })}
+        {/* X-axis date labels */}
+        {[sorted[0], sorted[sorted.length - 1]].map((e, i) => (
+          <text key={i} x={toX(Number(e.timestamp))} y={H - 2} textAnchor={i === 0 ? "start" : "end"} fill="rgba(255,255,255,0.2)" fontSize="7" fontFamily="monospace">
+            {fmtDate(Number(e.timestamp))}
+          </text>
+        ))}
+      </svg>
     </div>
   );
 }
@@ -1217,6 +1284,9 @@ export default function ContractUI({ walletAddress, onConnect, isConnecting }: C
                         </div>
                       );
                     })()}
+                    {/* Timeline chart */}
+                    <ScoreTimelineChart scores={historyData} />
+
                     {historyData.length === 0 ? (
                       <div className="rounded-xl border border-white/[0.07] bg-[#0d0d0d] px-4 py-6 text-center">
                         <p className="text-sm text-white/25">No scores found for this user</p>
