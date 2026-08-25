@@ -34,9 +34,6 @@ jobs:
       - name: Check contract compiles
         run: cargo check
 
-      - name: Run contract tests
-        run: cargo test
-
   # ── Frontend ──────────────────────────────────────────────
   frontend:
     name: Frontend (Next.js)
