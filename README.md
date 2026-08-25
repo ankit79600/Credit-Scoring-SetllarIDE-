@@ -2,7 +2,7 @@
 
 **Live Application:** [my-credit-scoring-1.vercel.app](https://my-credit-scoring-1.vercel.app) &nbsp;|&nbsp;
 **Demo Video:** [Watch on Loom](https://www.loom.com/share/fe542c9d3ec44064aeda35fcf7848c4e) &nbsp;|&nbsp;
-**Pitch Deck:** [PITCH.md](./PITCH.md) &nbsp;|&nbsp;
+**Pitch Deck:** [Google Slides](https://docs.google.com/presentation/d/11doWdxTHIv3bGS4RtnKatZJhh0Sh1CyY/view?usp=sharing) &nbsp;|&nbsp;
 **Feedback Form:** [forms.gle/6hdSkpKgnYBqzp7J6](https://forms.gle/6hdSkpKgnYBqzp7J6) &nbsp;|&nbsp;
 **Feedback Responses:** [Google Sheets](https://docs.google.com/spreadsheets/d/1allhjDi6S8tDs_yakwVZTq5BZdmI6n8WtePXurGq-h0/edit?usp=sharing)
 
@@ -410,7 +410,7 @@ The demo covers the full user flow: onboarding modal, wallet connection, Friendb
 - Deployment script: [scripts/deploy-contract.sh](./scripts/deploy-contract.sh)
 - Frontend details: [client/README.md](./client/README.md)
 - Contributing guide: [CONTRIBUTING.md](./CONTRIBUTING.md)
-- Pitch deck: [PITCH.md](./PITCH.md)
+- Pitch deck: [Google Slides](https://docs.google.com/presentation/d/11doWdxTHIv3bGS4RtnKatZJhh0Sh1CyY/view?usp=sharing)
 
 ## Contact
 
