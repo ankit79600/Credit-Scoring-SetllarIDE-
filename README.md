@@ -303,6 +303,21 @@ User responses are available at [docs/user-feedback-responses.csv](./docs/user-f
 ### Leaderboard
 <img alt="Leaderboard — Top Credit Scores on Stellar Testnet" src="./docs/screenshots/ui-leaderboard.png" />
 
+### Mobile Responsive Design
+
+<table>
+  <tr>
+    <td><img alt="Mobile Hero" src="./docs/screenshots/mobile-hero.png" /></td>
+    <td><img alt="Mobile Dashboard" src="./docs/screenshots/mobile-dashboard.png" /></td>
+    <td><img alt="Mobile Leaderboard" src="./docs/screenshots/mobile-leaderboard.png" /></td>
+  </tr>
+  <tr>
+    <td align="center">Hero</td>
+    <td align="center">Dashboard</td>
+    <td align="center">Leaderboard</td>
+  </tr>
+</table>
+
 ## Proof of 50+ User Interactions
 
 55 unique wallets (5 target users + 50 evaluators) were funded via Friendbot and interacted with the smart contract on Stellar Testnet. All transactions are reproducible by running `scripts/generate-interactions.mjs`.
