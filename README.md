@@ -294,17 +294,14 @@ User responses are available at [docs/user-feedback-responses.csv](./docs/user-f
 
 ## Screenshots
 
-### Product UI
-<img width="1904" height="848" alt="Credit Scoring dApp UI" src="https://github.com/user-attachments/assets/0b301c5c-4a0d-4c05-a7c6-812a01654740" />
+### Hero — Landing Page
+<img alt="Credit Scoring dApp Hero" src="./docs/screenshots/ui-hero.png" />
 
-### Smart Contract Deployment
-<img width="1482" height="586" alt="Contract Deployment Address" src="https://github.com/user-attachments/assets/0116c524-7ce6-4e28-bd18-ab1ffc99fc42" />
+### Dashboard — Contract Panel
+<img alt="Contract Dashboard with Lookup/Submit/History tabs" src="./docs/screenshots/ui-dashboard.png" />
 
-### Analytics & Monitoring
-<img width="1514" height="769" alt="PostHog Analytics Dashboard" src="https://github.com/user-attachments/assets/c81061b8-727f-4cb8-911d-7c621cfc52d7" />
-
-### Mobile Responsive Design
-<img width="225" height="472" alt="Mobile view" src="https://github.com/user-attachments/assets/2b7bf516-bd4a-4871-a327-7f2f9f7a64d2" />
+### Leaderboard
+<img alt="Leaderboard — Top Credit Scores on Stellar Testnet" src="./docs/screenshots/ui-leaderboard.png" />
 
 ## Proof of 50+ User Interactions
 
