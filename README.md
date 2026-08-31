@@ -303,6 +303,9 @@ User responses are available at [docs/user-feedback-responses.csv](./docs/user-f
 ### Leaderboard
 <img alt="Leaderboard — Top Credit Scores on Stellar Testnet" src="./docs/screenshots/ui-leaderboard.png" />
 
+### Analytics — PostHog Live Events
+<img alt="PostHog analytics dashboard showing live user events" src="./docs/screenshots/analytics-posthog.png" />
+
 ### Mobile Responsive Design
 
 <table>
