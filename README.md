@@ -1,7 +1,7 @@
 # Credit Scoring System: Decentralized Credit Scoring on Stellar Soroban
 
 **Live Application:** [my-credit-scoring-1.vercel.app](https://my-credit-scoring-1.vercel.app) &nbsp;|&nbsp;
-**Demo Video:** [Watch on Loom](https://www.loom.com/share/fe542c9d3ec44064aeda35fcf7848c4e) &nbsp;|&nbsp;
+**Demo Video:** [Watch on YouTube](https://youtu.be/7mKTYzhx8IM) &nbsp;|&nbsp;
 **Pitch Deck:** [Google Slides](https://docs.google.com/presentation/d/11doWdxTHIv3bGS4RtnKatZJhh0Sh1CyY/view?usp=sharing) &nbsp;|&nbsp;
 **Feedback Form:** [forms.gle/6hdSkpKgnYBqzp7J6](https://forms.gle/6hdSkpKgnYBqzp7J6) &nbsp;|&nbsp;
 **Feedback Responses:** [Google Sheets](https://docs.google.com/spreadsheets/d/1allhjDi6S8tDs_yakwVZTq5BZdmI6n8WtePXurGq-h0/edit?usp=sharing)
@@ -390,9 +390,9 @@ Active usage is further evidenced by 52 Google Form responses with wallet addres
 
 ## Demo Video
 
-[![Watch Demo](https://cdn.loom.com/sessions/thumbnails/fe542c9d3ec44064aeda35fcf7848c4e-with-play.gif)](https://www.loom.com/share/fe542c9d3ec44064aeda35fcf7848c4e)
+[![Watch Demo](https://img.youtube.com/vi/7mKTYzhx8IM/maxresdefault.jpg)](https://youtu.be/7mKTYzhx8IM)
 
-**[Watch on Loom →](https://www.loom.com/share/fe542c9d3ec44064aeda35fcf7848c4e)**
+**[Watch on YouTube →](https://youtu.be/7mKTYzhx8IM)**
 
 The demo covers the full user flow: onboarding modal, wallet connection, Friendbot funding, score submission (signed with Freighter, confirmed in ~5s), score lookup with percentile, JSON export, Request Evaluation link, and the PostHog analytics dashboard.
 
