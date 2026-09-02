@@ -343,4 +343,22 @@ export async function getAverageScoreIfThreshold(
   );
 }
 
+/**
+ * Remove an evaluator's score for a user. Only the evaluator themselves can call this.
+ * Calls: remove_score(user: Address, evaluator: Address)
+ */
+export async function removeScore(
+  caller: string,
+  user: string,
+  evaluatorAddr: string
+): Promise<string> {
+  const res = await callContract(
+    "remove_score",
+    [toScValAddress(user), toScValAddress(evaluatorAddr)],
+    caller,
+    true
+  ) as { txHash: string };
+  return res.txHash;
+}
+
 export { nativeToScVal, scValToNative, Address, xdr };

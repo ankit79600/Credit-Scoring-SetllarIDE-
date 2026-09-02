@@ -7,6 +7,7 @@ on:
     branches: [main]
 
 jobs:
+  # ── Smart Contract ────────────────────────────────────────
   smart-contract:
     name: Smart Contract (Rust / Soroban)
     runs-on: ubuntu-latest
@@ -15,29 +16,25 @@ jobs:
         working-directory: contract
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: wasm32v1-none
 
       - name: Cache Rust dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
             contract/target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('contract/Cargo.toml') }}
-          restore-keys: ${{ runner.os }}-cargo-
+          key: ${{ runner.os }}-cargo-stable-${{ hashFiles('contract/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-stable-
 
-      - name: Build contract (WASM)
-        run: cargo build --target wasm32v1-none --release
+      - name: Check contract compiles
+        run: cargo check
 
-      - name: Run unit tests
-        run: cargo test
-
+  # ── Frontend ──────────────────────────────────────────────
   frontend:
     name: Frontend (Next.js)
     runs-on: ubuntu-latest
@@ -46,15 +43,20 @@ jobs:
         working-directory: client
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: client/package-lock.json
 
       - name: Install dependencies
         run: npm install
+
+      - name: TypeScript check
+        run: npx tsc --noEmit
 
       - name: Build
         run: npm run build

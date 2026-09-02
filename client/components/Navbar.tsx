@@ -1,18 +1,11 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { NETWORK } from "@/hooks/contract";
-import { Badge } from "@/components/ui/badge";
 
-function WalletIcon({ size = 16 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" />
-      <path d="M3 5v14a2 2 0 0 0 2 2h16v-5" />
-      <path d="M18 12a2 2 0 0 0 0 4h4v-4Z" />
-    </svg>
-  );
-}
+// ── Icons ──────────────────────────────────────────────────────
 
 function CopyIcon() {
   return (
@@ -25,7 +18,7 @@ function CopyIcon() {
 
 function CheckSmallIcon() {
   return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#34d399" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
       <polyline points="20 6 9 17 4 12" />
     </svg>
   );
@@ -40,11 +33,31 @@ function PowerIcon() {
   );
 }
 
+function WalletIcon() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" />
+      <path d="M3 5v14a2 2 0 0 0 2 2h16v-5" />
+      <path d="M18 12a2 2 0 0 0 0 4h4v-4Z" />
+    </svg>
+  );
+}
+
+function SpinnerIcon() {
+  return (
+    <svg className="animate-spin" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+      <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+    </svg>
+  );
+}
+
+// ── Navbar ─────────────────────────────────────────────────────
+
 interface NavbarProps {
-  walletAddress: string | null;
-  onConnect: () => Promise<void>;
-  onDisconnect: () => void;
-  isConnecting: boolean;
+  walletAddress?: string | null;
+  onConnect?: () => Promise<void>;
+  onDisconnect?: () => void;
+  isConnecting?: boolean;
   onOpenGuide?: () => void;
 }
 
@@ -52,21 +65,15 @@ export default function Navbar({
   walletAddress,
   onConnect,
   onDisconnect,
-  isConnecting,
+  isConnecting = false,
   onOpenGuide,
 }: NavbarProps) {
+  const pathname = usePathname();
   const [copied, setCopied] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
   const [connectError, setConnectError] = useState<string | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 10);
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  // Close dropdown on outside click
   useEffect(() => {
     if (!showDropdown) return;
     const close = () => setShowDropdown(false);
@@ -83,148 +90,238 @@ export default function Navbar({
 
   const truncate = (addr: string) => `${addr.slice(0, 4)}...${addr.slice(-4)}`;
 
+  const NAV_LINKS = [
+    { label: "Home", href: "/" },
+    { label: "Dashboard", href: "/dashboard" },
+    { label: "Leaderboard", href: "/leaderboard" },
+    { label: "Docs", href: "https://developers.stellar.org/docs/smart-contracts", external: true },
+    { label: "GitHub", href: "https://github.com/ankit79600/My-Credit-Scoring", external: true },
+  ];
+
   return (
     <nav
-      className={`sticky top-0 z-50 w-full border-b transition-all duration-300 animate-fade-in-down ${
-        scrolled
-          ? "border-white/[0.08] bg-[#050510]/90 backdrop-blur-2xl shadow-[0_4px_30px_rgba(0,0,0,0.5)]"
-          : "border-white/[0.04] bg-transparent backdrop-blur-sm"
-      }`}
+      className="sticky top-0 z-50 w-full border-b border-white/[0.05] animate-fade-in-down"
+      style={{
+        backdropFilter: "blur(24px) saturate(160%)",
+        WebkitBackdropFilter: "blur(24px) saturate(160%)",
+        background: "rgba(3,3,8,0.75)",
+      }}
     >
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 lg:px-10 py-3 gap-4">
         {/* Logo */}
-        <div className="flex items-center gap-3">
-          <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#7c6cf0] to-[#4fc3f7] shadow-[0_0_20px_rgba(124,108,240,0.3)]">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2" />
-              <path d="M15 18H9" />
-              <path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14" />
-              <circle cx="17" cy="18" r="2" />
-              <circle cx="7" cy="18" r="2" />
+        <Link href="/" className="flex items-center gap-3 shrink-0 group">
+          <div
+            className="flex h-8 w-8 items-center justify-center rounded-xl border border-[#7c6cf0]/25 transition-all group-hover:border-[#7c6cf0]/50 group-hover:shadow-[0_0_20px_rgba(124,108,240,0.2)]"
+            style={{ background: "rgba(124,108,240,0.1)" }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c6cf0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
             </svg>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-base font-semibold tracking-tight text-white">
-              Credit Scoring System
+            <span className="text-sm font-semibold tracking-wide text-white/85 group-hover:text-white transition-colors">
+              Credit Scoring
             </span>
-            <span className="hidden sm:inline-block text-[10px] font-mono text-white/20 border border-white/[0.06] rounded px-1.5 py-0.5">
-              v1.0
+            <span className="hidden sm:inline text-[9px] font-mono text-white/20 border border-white/[0.06] rounded px-1.5 py-0.5 tracking-wider">
+              v2.0
             </span>
           </div>
-        </div>
+        </Link>
 
-        {/* Right side */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        {/* Desktop nav links */}
+        <div className="hidden md:flex items-center gap-1 flex-1 justify-center">
+          {NAV_LINKS.map((item) => {
+            const isActive = !item.external && pathname === item.href;
+            return item.external ? (
+              <a
+                key={item.label}
+                href={item.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-3 py-1.5 text-[12px] text-white/30 hover:text-white/65 transition-colors"
+              >
+                {item.label}
+              </a>
+            ) : (
+              <Link
+                key={item.label}
+                href={item.href}
+                className={`relative px-3 py-1.5 text-[12px] transition-colors ${
+                  isActive ? "text-white/80" : "text-white/30 hover:text-white/65"
+                }`}
+              >
+                {item.label}
+                {isActive && (
+                  <span
+                    className="absolute bottom-0 left-3 right-3 h-px rounded-full"
+                    style={{ background: "linear-gradient(90deg, transparent, #7c6cf0, transparent)" }}
+                  />
+                )}
+              </Link>
+            );
+          })}
           {onOpenGuide && (
             <button
               onClick={onOpenGuide}
-              className="hidden sm:flex items-center gap-1.5 rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-1.5 text-xs text-white/40 hover:border-white/[0.12] hover:text-white/70 transition-all"
+              className="px-3 py-1.5 text-[12px] text-white/30 hover:text-white/65 transition-colors"
             >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10" />
-                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
-                <line x1="12" y1="17" x2="12.01" y2="17" />
-              </svg>
               Guide
             </button>
           )}
-          <Badge variant="success">
+        </div>
+
+        {/* Right side */}
+        <div className="flex items-center gap-2 shrink-0">
+          {/* Network badge */}
+          <div
+            className="hidden sm:flex items-center gap-1.5 rounded-full border border-[#34d399]/15 bg-[#34d399]/[0.04] px-2.5 py-1 text-[9px] font-mono uppercase tracking-wider text-[#34d399]/60"
+          >
             <span className="h-1.5 w-1.5 rounded-full bg-[#34d399] animate-pulse" />
             {NETWORK}
-          </Badge>
+          </div>
 
-          {walletAddress ? (
-            <div className="relative">
-              <button
-                onClick={(e) => { e.stopPropagation(); setShowDropdown(!showDropdown); }}
-                className="flex items-center gap-2.5 rounded-xl border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-sm transition-all hover:border-white/[0.15] hover:bg-white/[0.06]"
-              >
-                <div className="h-6 w-6 rounded-full bg-gradient-to-br from-[#7c6cf0] to-[#4fc3f7] p-[1.5px]">
-                  <div className="flex h-full w-full items-center justify-center rounded-full bg-[#0a0a1a] text-[8px] font-bold text-white/80">
-                    {walletAddress.slice(0, 2)}
-                  </div>
-                </div>
-                <span className="font-mono text-xs text-white/70">
-                  {truncate(walletAddress)}
-                </span>
-                <svg
-                  width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-                  className={`text-white/30 transition-transform duration-200 ${showDropdown ? "rotate-180" : ""}`}
-                >
-                  <polyline points="6 9 12 15 18 9" />
-                </svg>
-              </button>
+          {/* Wallet */}
+          {onConnect && (
+            <>
+              {walletAddress ? (
+                <div className="relative">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setShowDropdown(!showDropdown); }}
+                    className="flex items-center gap-2 rounded-xl border border-white/[0.07] px-3 py-1.5 text-xs transition-all hover:border-white/[0.14]"
+                    style={{ background: "rgba(255,255,255,0.03)" }}
+                  >
+                    <div
+                      className="h-2 w-2 rounded-full"
+                      style={{ background: "radial-gradient(circle, #7c6cf0, #5b4fd4)", boxShadow: "0 0 8px #7c6cf060" }}
+                    />
+                    <span className="font-mono text-white/55">{truncate(walletAddress)}</span>
+                    <svg
+                      width="9" height="9" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" strokeWidth="2"
+                      className={`text-white/20 transition-transform duration-200 ${showDropdown ? "rotate-180" : ""}`}
+                    >
+                      <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                  </button>
 
-              {/* Dropdown */}
-              {showDropdown && (
-                <div
-                  className="absolute right-0 top-full mt-2 w-64 overflow-hidden rounded-xl border border-white/[0.08] bg-[#0c0c1d]/95 backdrop-blur-2xl shadow-2xl animate-fade-in-up"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <div className="p-3 border-b border-white/[0.06]">
-                    <p className="text-[10px] uppercase tracking-wider text-white/25 mb-2">
-                      Connected Wallet
-                    </p>
-                    <p className="font-mono text-xs text-white/60 break-all leading-relaxed">
-                      {walletAddress}
-                    </p>
-                  </div>
-                  <div className="p-1.5">
-                    <button
-                      onClick={() => { handleCopy(); setShowDropdown(false); }}
-                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-white/60 hover:bg-white/[0.06] hover:text-white/90 transition-colors"
+                  {showDropdown && (
+                    <div
+                      className="absolute right-0 top-full mt-2 w-64 overflow-hidden rounded-2xl border border-white/[0.07] shadow-2xl animate-fade-in-up"
+                      style={{
+                        backdropFilter: "blur(32px)",
+                        background: "rgba(10,10,20,0.92)",
+                        boxShadow: "0 20px 60px rgba(0,0,0,0.7)",
+                      }}
+                      onClick={(e) => e.stopPropagation()}
                     >
-                      {copied ? <CheckSmallIcon /> : <CopyIcon />}
-                      {copied ? "Copied!" : "Copy Address"}
-                    </button>
-                    <button
-                      onClick={() => { onDisconnect(); setShowDropdown(false); }}
-                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-[#f87171]/70 hover:bg-[#f87171]/[0.08] hover:text-[#f87171] transition-colors"
-                    >
-                      <PowerIcon />
-                      Disconnect
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="flex flex-col items-end gap-1">
-              <button
-                onClick={async () => {
-                  setConnectError(null);
-                  try {
-                    await onConnect();
-                  } catch (err: unknown) {
-                    setConnectError(err instanceof Error ? err.message : "Failed to connect wallet");
-                  }
-                }}
-                disabled={isConnecting}
-                className="relative overflow-hidden rounded-xl bg-gradient-to-r from-[#7c6cf0] to-[#5b8cf0] p-[1px] transition-all hover:shadow-[0_0_25px_rgba(124,108,240,0.25)] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <div className="flex items-center gap-2 rounded-[11px] bg-[#0c0c1d]/90 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm">
-                  {isConnecting ? (
-                    <>
-                      <svg className="animate-spin" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                        <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-                      </svg>
-                      Connecting...
-                    </>
-                  ) : (
-                    <>
-                      <WalletIcon size={14} />
-                      Connect
-                    </>
+                      <div className="p-4 border-b border-white/[0.06]">
+                        <p className="text-[9px] uppercase tracking-widest text-white/20 mb-2">
+                          Connected Wallet
+                        </p>
+                        <p className="font-mono text-xs text-white/45 break-all leading-relaxed">
+                          {walletAddress}
+                        </p>
+                      </div>
+                      <div className="p-1.5">
+                        <button
+                          onClick={() => { handleCopy(); setShowDropdown(false); }}
+                          className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-xs text-white/45 hover:bg-white/[0.05] hover:text-white/80 transition-colors"
+                        >
+                          {copied ? <CheckSmallIcon /> : <CopyIcon />}
+                          {copied ? "Copied!" : "Copy Address"}
+                        </button>
+                        <button
+                          onClick={() => { onDisconnect?.(); setShowDropdown(false); }}
+                          className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-xs text-[#f87171]/50 hover:bg-[#f87171]/[0.06] hover:text-[#f87171] transition-colors"
+                        >
+                          <PowerIcon />
+                          Disconnect
+                        </button>
+                      </div>
+                    </div>
                   )}
                 </div>
-              </button>
-              {connectError && (
-                <p className="text-[10px] text-[#f87171]/80 max-w-[200px] text-right">{connectError}</p>
+              ) : (
+                <div className="flex flex-col items-end gap-1">
+                  <button
+                    onClick={async () => {
+                      setConnectError(null);
+                      try {
+                        await onConnect();
+                      } catch (err: unknown) {
+                        setConnectError(
+                          err instanceof Error ? err.message : "Failed to connect"
+                        );
+                      }
+                    }}
+                    disabled={isConnecting}
+                    className="flex items-center gap-2 rounded-xl border border-[#7c6cf0]/35 px-4 py-1.5 text-xs font-medium text-[#7c6cf0] transition-all hover:border-[#7c6cf0]/60 hover:shadow-[0_0_20px_rgba(124,108,240,0.2)] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{ background: "rgba(124,108,240,0.08)" }}
+                  >
+                    {isConnecting ? <><SpinnerIcon /> Connecting...</> : <><WalletIcon /> Connect</>}
+                  </button>
+                  {connectError && (
+                    <p className="text-[10px] text-[#f87171]/70 max-w-[180px] text-right">
+                      {connectError}
+                    </p>
+                  )}
+                </div>
               )}
-            </div>
+            </>
           )}
+
+          {/* Mobile menu button */}
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="md:hidden flex items-center justify-center h-8 w-8 rounded-xl border border-white/[0.07] text-white/40 hover:text-white/70 transition-colors"
+          >
+            {menuOpen ? (
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            ) : (
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="4" y1="8" x2="20" y2="8" /><line x1="4" y1="16" x2="20" y2="16" />
+              </svg>
+            )}
+          </button>
         </div>
       </div>
+
+      {/* Mobile menu */}
+      {menuOpen && (
+        <div
+          className="md:hidden border-t border-white/[0.05] py-2"
+          style={{ background: "rgba(3,3,8,0.95)" }}
+        >
+          {NAV_LINKS.map((item) => {
+            const isActive = !item.external && pathname === item.href;
+            return item.external ? (
+              <a
+                key={item.label}
+                href={item.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center px-6 py-2.5 text-sm text-white/30 hover:text-white/65"
+                onClick={() => setMenuOpen(false)}
+              >
+                {item.label}
+              </a>
+            ) : (
+              <Link
+                key={item.label}
+                href={item.href}
+                className={`flex items-center px-6 py-2.5 text-sm transition-colors ${
+                  isActive ? "text-white/75" : "text-white/30 hover:text-white/65"
+                }`}
+                onClick={() => setMenuOpen(false)}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
+        </div>
+      )}
     </nav>
   );
 }

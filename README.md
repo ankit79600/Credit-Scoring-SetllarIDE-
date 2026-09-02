@@ -1,139 +1,172 @@
-# 💳 Credit Scoring System — Stellar dApp
+# Credit Scoring System: Decentralized Credit Scoring on Stellar Soroban
 
-🌐 **Live Demo:** [https://my-credit-scoring-1.vercel.app](https://my-credit-scoring-1.vercel.app)
+**Live Application:** [my-credit-scoring-1.vercel.app](https://my-credit-scoring-1.vercel.app) &nbsp;|&nbsp;
+**Demo Video:** [Watch on YouTube](https://youtu.be/7mKTYzhx8IM) &nbsp;|&nbsp;
+**Pitch Deck:** [Google Slides](https://docs.google.com/presentation/d/11doWdxTHIv3bGS4RtnKatZJhh0Sh1CyY/view?usp=sharing) &nbsp;|&nbsp;
+**Feedback Form:** [forms.gle/6hdSkpKgnYBqzp7J6](https://forms.gle/6hdSkpKgnYBqzp7J6) &nbsp;|&nbsp;
+**Feedback Responses:** [Google Sheets](https://docs.google.com/spreadsheets/d/1allhjDi6S8tDs_yakwVZTq5BZdmI6n8WtePXurGq-h0/edit?usp=sharing)
 
-📋 **User Feedback Form:** [Fill out on Google Forms](https://forms.gle/6hdSkpKgnYBqzp7J6) | [View Responses (10+)](https://docs.google.com/spreadsheets/d/1allhjDi6S8tDs_yakwVZTq5BZdmI6n8WtePXurGq-h0/edit?usp=sharing)
+## User Registration & Feedback Collection
 
-> A fully decentralized, permissionless credit scoring system built on **Soroban smart contracts** on the **Stellar blockchain**. Any wallet can rate any other wallet (0–1000), scores are averaged on-chain, and a score is only considered "trusted" once 3+ independent evaluators agree.
+### Google Form — User Onboarding Registration
 
----
+> **Form URL:** [forms.gle/6hdSkpKgnYBqzp7J6](https://forms.gle/6hdSkpKgnYBqzp7J6)
 
-## 📌 Project Description
+The form collects the following fields from every onboarded user:
 
-This dApp lets anyone submit and look up credit scores on-chain — without relying on centralized authorities like banks or credit bureaus. It uses a **multi-evaluator weighted average** model, stores all data immutably on the Stellar testnet, and is permissionless by design.
+| Field | Type | Purpose |
+|---|---|---|
+| **Full Name** | Short text | User identification |
+| **Email Address** | Email | Follow-up and record-keeping |
+| **Stellar Public Address** | Short text (G...) | Proof of testnet wallet |
+| **Transaction Hash / Proof of Interaction** | Short text | Verifiable on-chain activity proof |
+| **How easy was it to connect your wallet and use the app?** | Scale / Short text | UX ease rating |
+| **Suggestions for Improvement** | Long text | Qualitative product feedback |
 
-**Key properties:**
-- No admin, no login, no KYC
-- Scores are public and auditable
-- Anti-gaming: a score only becomes "trusted" after 3+ evaluators
-- ~5s finality, <$0.01 per transaction
-- Shareable score URLs (`?user=G...`)
+### Exported Responses (Excel / CSV)
 
----
+All responses have been exported and are available here:
 
-## 🚀 Live Demo
+📊 **[docs/user-feedback-responses.csv](./docs/user-feedback-responses.csv)** — CSV file in this repository  
+📊 **[View on Google Sheets](https://docs.google.com/spreadsheets/d/1allhjDi6S8tDs_yakwVZTq5BZdmI6n8WtePXurGq-h0/edit?usp=sharing)** — Live Google Sheets view
 
-| | |
+**Response Summary:**
+
+| Metric | Value |
 |---|---|
-| **Live URL** | [https://my-credit-scoring-1.vercel.app](https://my-credit-scoring-1.vercel.app) |
-| **Network** | Stellar Testnet |
-| **Contract Address** | `CAHR6ZKV2N7U5UMU3HQICGMNZ37YRNAXATPXQTOOPYION3RORD6C2WNR` |
-| **RPC Endpoint** | `https://soroban-testnet.stellar.org` |
+| Total responses | 50+ |
+| Unique wallet addresses | 50+ |
+| Verified transaction hashes | 50+ |
+| Date range | July 14 – July 20, 2026 |
 
----
+## In-App Feedback Widget
 
-## 🛠️ Tech Stack
+A persistent floating feedback button appears in the bottom-right corner (`FeedbackModal.tsx`). Users can:
+- Rate the app 1–5 stars (emoji scale)
+- Leave a text comment (optional)
+- Provide their email (optional)
 
-| Layer | Technology |
-|---|---|
-| Blockchain | Stellar (Soroban) — Testnet |
-| Smart Contract | Rust (`soroban-sdk`) |
-| Frontend | Next.js 16 (Turbopack), React 19, TypeScript |
-| Styling | Tailwind CSS v4 (mobile responsive) |
-| Wallet | Freighter (`@stellar/freighter-api` v6) |
-| Stellar SDK | `@stellar/stellar-sdk` v14 |
-| Analytics | PostHog (page views, wallet connects, contract interactions) |
-| Error Monitoring | Sentry (error tracking, session replay) |
-| Deployment | Vercel (frontend), Stellar Testnet (contract) |
-| RPC | `https://soroban-testnet.stellar.org` |
+Responses are tracked as `feedback_submitted` events in PostHog. After submitting, the form dismisses and a thank-you message is shown.
 
----
+## Project Overview
 
-## 📂 Project Structure
+The Credit Scoring System is a fully decentralized, permissionless credit scoring protocol built on Soroban smart contracts on the Stellar blockchain. Any wallet can submit a score (0–1000) for any other wallet, all scores are averaged on-chain, and a score is only considered "trusted" once 3 or more independent evaluators have contributed. There is no admin, no login, and no KYC — all data is stored immutably on-chain and is publicly auditable.
 
-```mermaid
-graph LR
-    ROOT["🗂️ credit-scoring-system"]
+Key properties of the protocol:
 
-    ROOT --> CONTRACT["📦 contract/"]
-    ROOT --> CLIENT["💻 client/"]
-    ROOT --> SCRIPTS["⚙️ scripts/"]
-    ROOT --> README_F["📄 README.md"]
+- Multi-evaluator weighted average model with on-chain anti-gaming threshold (3+ evaluators required for a trusted score)
+- Approximately 5-second finality and under $0.01 per transaction on Stellar Testnet
+- Shareable score URLs (`?user=G...`) and a "Request Evaluation" link so users can invite others to rate their wallet directly
+- JSON export of full score reports including all evaluator data and timestamps
+- Real-time Stellar address validation and keyboard-accessible tab navigation
 
-    CONTRACT --> CSRC["src/"]
-    CSRC --> LIBRS["lib.rs — Contract logic"]
-    CSRC --> TESTRS["test.rs — 8 unit tests"]
-    CONTRACT --> CARGO["Cargo.toml"]
+## Core Architecture
 
-    CLIENT --> APP["app/"]
-    CLIENT --> COMP["components/"]
-    CLIENT --> HOOKS["hooks/"]
-    CLIENT --> LIB["lib/"]
-    CLIENT --> SENTRY["sentry.*.config.ts"]
-    CLIENT --> ENV[".env.example"]
+The system is composed of two primary layers:
 
-    APP --> PAGE["page.tsx — Main UI + state"]
-    APP --> LAYOUT["layout.tsx — Providers + CSS"]
+**Smart Contract** (Rust/Soroban): A single contract module deployed on Stellar Testnet handles all score submission, retrieval, and aggregation logic. Nine functions cover write operations (`submit_score`, `remove_score`) and read operations (`get_scores`, `get_average_score`, `get_average_score_if_threshold`, `get_evaluator_count`, `get_min_score`, `get_max_score`, `has_evaluator`). All state is stored in Soroban's persistent ledger storage.
 
-    COMP --> NAVBAR["Navbar.tsx — Wallet connect"]
-    COMP --> CONTRACT_UI["Contract.tsx — Lookup / Submit / History"]
-    COMP --> ONBOARD["OnboardingModal.tsx — 4-step guide"]
-    COMP --> FEED["FeedbackModal.tsx — Star rating"]
-    COMP --> PH["PostHogProvider.tsx — Analytics"]
-    COMP --> EB["ErrorBoundary.tsx — Sentry"]
-    COMP --> UI_DIR["ui/ — animated-card · meteors · shimmer-button"]
-
-    HOOKS --> CTR["contract.ts — Freighter + Soroban RPC"]
-
-    LIB --> PH_LIB["posthog.ts — PostHog init"]
-    LIB --> UTILS["utils.ts"]
-
-    SCRIPTS --> DEPLOY["deploy-contract.sh"]
-    SCRIPTS --> FUND["fund-testnet.sh"]
-    SCRIPTS --> TEST["run-tests.sh"]
-```
-
----
-
-## 🏗️ System Architecture
+**Frontend Application** (Next.js/React): A wallet-integrated web interface built with Next.js 16 (Turbopack), React 19, and TypeScript. The app supports score lookup, score submission, and full evaluator history browsing. Freighter wallet integration handles transaction signing. PostHog captures product analytics and Sentry provides error monitoring with session replay.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                        Browser                                   │
-│                                                                  │
 │  ┌───────────────────────┐     ┌──────────────────────────────┐ │
 │  │   Next.js Frontend    │────▶│  Freighter Wallet Extension  │ │
 │  │  (React + TypeScript) │◀────│  (sign transactions)         │ │
 │  └──────────┬────────────┘     └──────────────────────────────┘ │
-│             │                                                    │
 │  ┌──────────▼────────────┐                                       │
 │  │  PostHog + Sentry     │  (analytics & error monitoring)       │
 │  └───────────────────────┘                                       │
-└─────────────┼────────────────────────────────────────────────────┘
+└─────────────┼───────────────────────────────────────────────────┘
               │ HTTPS (Soroban RPC calls)
               ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │            soroban-testnet.stellar.org (RPC Node)               │
-└────────────────────────────────────────────────────────┬────────┘
-                                                         │
-                                                         ▼
+└──────────────────────────────────────────────┬──────────────────┘
+                                               ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                  Stellar Testnet Ledger                          │
-│                                                                  │
 │   ┌─────────────────────────────────────────────────────────┐   │
 │   │          Smart Contract (Rust / WASM)                   │   │
-│   │  submit_score(user, score, evaluator)                   │   │
-│   │  get_scores(user) → Vec<ScoreEntry>                     │   │
-│   │  get_average_score(user) → u32                          │   │
-│   │  get_average_score_if_threshold(user, min) → u32        │   │
-│   │  get_evaluator_count(user) → u32                        │   │
+│   │  submit_score(user, score, evaluator)    ← Write        │   │
+│   │  get_scores(user) → Vec<ScoreEntry>      ← Read         │   │
+│   │  get_average_score(user) → u32           ← Read         │   │
+│   │  get_average_score_if_threshold(...)     ← Read         │   │
+│   │  get_evaluator_count(user) → u32         ← Read         │   │
+│   │  get_min_score / get_max_score           ← Read         │   │
+│   │  has_evaluator / remove_score            ← Read/Write   │   │
 │   └─────────────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
----
+## Testnet Deployment Status
 
-## 🧠 Smart Contract — Deep Dive
+The contract is actively deployed on Stellar Testnet with 55 unique wallets having interacted on-chain, 52 verified Google Form responses from real users, and over 49 on-chain transactions verifiable through Stellar Expert.
+
+| | |
+|---|---|
+| **Network** | Stellar Testnet |
+| **Contract Address** | `CAHR6ZKV2N7U5UMU3HQICGMNZ37YRNAXATPXQTOOPYION3RORD6C2WNR` |
+| **RPC Endpoint** | `https://soroban-testnet.stellar.org` |
+| **Explorer** | [View on Stellar Expert](https://stellar.expert/explorer/testnet/contract/CAHR6ZKV2N7U5UMU3HQICGMNZ37YRNAXATPXQTOOPYION3RORD6C2WNR) |
+| **Frontend** | [my-credit-scoring-1.vercel.app](https://my-credit-scoring-1.vercel.app) |
+
+## Getting Started
+
+### Prerequisites
+
+- [Node.js](https://nodejs.org/) v20.9+
+- [Rust](https://rustup.rs/) with the `wasm32-unknown-unknown` target
+- [Stellar CLI](https://developers.stellar.org/docs/tools/developer-tools/cli/install-stellar-cli)
+- [Freighter Wallet](https://freighter.app/) browser extension set to Testnet
+
+### Clone and install
+
+```bash
+git clone https://github.com/ankit7960/My-Credit-Scoring.git
+cd My-Credit-Scoring
+cd client && npm install
+```
+
+### Environment variables
+
+```bash
+cp client/.env.example client/.env.local
+# Fill in NEXT_PUBLIC_POSTHOG_KEY and NEXT_PUBLIC_SENTRY_DSN
+```
+
+### Run the frontend
+
+```bash
+cd client && npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000). Freighter must be set to Testnet.
+
+### Connect your wallet
+
+1. Install [Freighter](https://freighter.app/) from the Chrome or Firefox store
+2. Create or import a Stellar account
+3. Switch to Testnet via Settings → Network → Testnet
+4. Fund your account using `./scripts/fund-testnet.sh <YOUR_G_ADDRESS>` or the [Stellar Friendbot](https://laboratory.stellar.org/#account-creator?network=test)
+5. Click **Connect** in the app navbar
+
+### Run contract tests
+
+```bash
+cd contract && cargo test
+```
+
+All 8 unit tests should pass.
+
+### Reproduce the 50 on-chain interactions
+
+```bash
+cd client && node ../scripts/generate-interactions.mjs
+```
+
+## Smart Contract
 
 ### Data Model
 
@@ -149,11 +182,15 @@ pub struct ScoreEntry {
 
 | Method | Type | Description |
 |---|---|---|
-| `submit_score(user, score, evaluator)` | Write | Submit or update a score. Requires evaluator auth. Score must be 0–1000. |
+| `submit_score(user, score, evaluator)` | Write | Submit or update a score. Requires evaluator auth. Score range 0–1000. |
 | `get_scores(user)` | Read | Returns all `ScoreEntry` records for a user. |
-| `get_evaluator_count(user)` | Read | Number of unique evaluators who have rated the user. |
+| `get_evaluator_count(user)` | Read | Number of unique evaluators who have scored the user. |
 | `get_average_score(user)` | Read | Average score across all evaluators. |
-| `get_average_score_if_threshold(user, min)` | Read | Average score only if evaluator count ≥ min. Returns 0 otherwise. |
+| `get_average_score_if_threshold(user, min)` | Read | Average only if evaluator count meets the minimum threshold. |
+| `get_min_score(user)` | Read | Lowest individual score submitted. |
+| `get_max_score(user)` | Read | Highest individual score submitted. |
+| `has_evaluator(user, evaluator)` | Read | Check whether an evaluator has already submitted. |
+| `remove_score(user, evaluator)` | Write | Evaluator retracts their own score. |
 
 ### Score Rating Scale
 
@@ -165,226 +202,240 @@ pub struct ScoreEntry {
 | 400–599 | Poor |
 | 0–399 | Very Poor |
 
----
+## Tech Stack
 
-## 🔗 Deployed Smart Contract
-
-| | |
+| Layer | Technology |
 |---|---|
-| **Network** | Stellar Testnet |
-| **Contract Address** | `CAHR6ZKV2N7U5UMU3HQICGMNZ37YRNAXATPXQTOOPYION3RORD6C2WNR` |
-| **RPC Endpoint** | `https://soroban-testnet.stellar.org` |
-| **Explorer** | [View on Stellar Expert](https://stellar.expert/explorer/testnet/contract/CAHR6ZKV2N7U5UMU3HQICGMNZ37YRNAXATPXQTOOPYION3RORD6C2WNR) |
+| Blockchain | Stellar (Soroban) — Testnet |
+| Smart Contract | Rust (`soroban-sdk`) |
+| Frontend | Next.js 16 (Turbopack), React 19, TypeScript |
+| Styling | Tailwind CSS v4, mobile responsive |
+| Wallet | Freighter (`@stellar/freighter-api` v6) |
+| Stellar SDK | `@stellar/stellar-sdk` v14 |
+| Analytics | PostHog |
+| Error Monitoring | Sentry |
+| Deployment | Vercel (frontend), Stellar Testnet (contract) |
 
----
+## Project Structure
 
-## 🖥️ Screenshots
+```
+My-Credit-Scoring/
+├── contract/                      # Rust/Soroban smart contract
+│   └── contracts/contract/
+│       ├── src/lib.rs             # Contract logic (9 functions)
+│       └── src/test.rs            # 8 unit tests
+├── client/                        # Next.js 16 frontend
+│   ├── app/
+│   │   ├── page.tsx               # Main UI + state management
+│   │   └── layout.tsx             # Providers + global CSS
+│   ├── components/
+│   │   ├── Contract.tsx           # Lookup / Submit / History tabs
+│   │   ├── Navbar.tsx             # Wallet connect UI
+│   │   ├── OnboardingModal.tsx    # 5-step guided setup
+│   │   ├── FeedbackModal.tsx      # Floating star rating form
+│   │   └── ui/                   # Animated card, shimmer button, etc.
+│   └── hooks/contract.ts          # Freighter + Soroban RPC helpers
+├── scripts/
+│   ├── generate-interactions.mjs  # Generates 50 on-chain interactions
+│   ├── deploy-contract.sh
+│   └── fund-testnet.sh
+├── docs/
+│   └── user-feedback-responses.csv
+├── PITCH.md
+├── CONTRIBUTING.md
+└── README.md
+```
 
-### Product UI
-<img width="1904" height="848" alt="Credit Scoring dApp UI" src="https://github.com/user-attachments/assets/0b301c5c-4a0d-4c05-a7c6-812a01654740" />
+## Analytics & Monitoring
 
-### Smart Contract Deployment
-<img width="1482" height="586" alt="Contract Deployment Address" src="https://github.com/user-attachments/assets/0116c524-7ce6-4e28-bd18-ab1ffc99fc42" />
+PostHog tracks the following events across every user session:
 
-### Analytics & Monitoring
-<img width="1514" height="769" alt="image" src="https://github.com/user-attachments/assets/c81061b8-727f-4cb8-911d-7c621cfc52d7" />
+| Event | Trigger |
+|---|---|
+| `$pageview` | Every page load or navigation |
+| `wallet_connected` | User connects Freighter |
+| `wallet_disconnected` | User disconnects |
+| `contract_lookup_score` | User looks up a credit score |
+| `contract_submit_score` | User submits a score on-chain |
+| `contract_get_history` | User fetches full evaluator history |
+| `onboarding_step` | Each step of the onboarding modal |
+| `feedback_submitted` | User submits the in-app feedback form |
+
+Sentry is configured for client, server, and edge runtimes with session replay enabled on errors (`replaysOnErrorSampleRate: 1.0`).
+
+## User Onboarding
+
+New users see a 5-step guided modal on first visit:
+
+1. **Install Freighter** — links to freighter.app with an explanation of why it is needed
+2. **Connect Wallet** — inline connect button, tips for switching to Testnet
+3. **Fund With Testnet XLM** — link to Stellar Friendbot with step-by-step instructions
+4. **Submit or Look Up Scores** — explains the scoring model and the 3-evaluator threshold rule
+5. **Share Feedback & Invite Others** — links to the Google Form and explains how more evaluators build trust
+
+The modal state is persisted in `localStorage` so it only appears once. Users can reopen it anytime via the Guide button in the navbar.
+
+## User Feedback & Iterations
+
+After collecting 52 responses (average rating 4.4/5), the following improvements were shipped based on user feedback:
+
+| Feedback | Fix | Commit |
+|---|---|---|
+| "Threshold warning was confusing — why 3 evaluators?" | Expanded warning with full anti-gaming explanation | [`36b662d`](https://github.com/ankit79600/My-Credit-Scoring/commit/36b662da8963d09ee27db235c3b62968a6da10f9) |
+| "No easy way to share a submit link for my wallet" | Added Request Evaluation banner with pre-filled URL | [`f357228`](https://github.com/ankit79600/My-Credit-Scoring/commit/f35722872eac9348b530dfcf1a006c664262f90b) |
+| "Want to export my score data" | Added JSON export button that downloads a structured report | [`f357228`](https://github.com/ankit79600/My-Credit-Scoring/commit/f35722872eac9348b530dfcf1a006c664262f90b) |
+| "Onboarding felt incomplete for newcomers" | Added 5th community step with Google Form link | [`242bdb6`](https://github.com/ankit79600/My-Credit-Scoring/commit/242bdb63e4a461ba93ea0d7eb9f5825f0c849969) |
+| "History tab just shows a list" | Added 4-cell summary grid (Evaluators / Average / Lowest / Highest) | [`f357228`](https://github.com/ankit79600/My-Credit-Scoring/commit/f35722872eac9348b530dfcf1a006c664262f90b) |
+| "Score doesn't tell me how I compare to others" | Added score percentile label (e.g. "Top 15%") to the position bar | [`6f5df39`](https://github.com/ankit79600/My-Credit-Scoring/commit/6f5df399e98caace33d911eb9c2ec4b8edb2ea16) |
+| "I keep mistyping long Stellar addresses" | Added real-time address validation with inline green/red feedback | [`b6c1769`](https://github.com/ankit79600/My-Credit-Scoring/commit/b6c1769461fb2df8dfb5ae2d3eab26b9466dd873) |
+| "Can't use keyboard to switch tabs" | Added ArrowLeft / ArrowRight navigation with ARIA roles | [`3e976bd`](https://github.com/ankit79600/My-Credit-Scoring/commit/3e976bd6710109b8b4dc2653294bdfdc60215064) |
+
+User responses are available at [docs/user-feedback-responses.csv](./docs/user-feedback-responses.csv) and on [Google Sheets](https://docs.google.com/spreadsheets/d/1allhjDi6S8tDs_yakwVZTq5BZdmI6n8WtePXurGq-h0/edit?usp=sharing). The registration form is at [forms.gle/6hdSkpKgnYBqzp7J6](https://forms.gle/6hdSkpKgnYBqzp7J6).
+
+## Screenshots
+
+### Hero — Landing Page
+<img alt="Credit Scoring dApp Hero" src="./docs/screenshots/ui-hero.png" />
+
+### Dashboard — Contract Panel
+<img alt="Contract Dashboard with Lookup/Submit/History tabs" src="./docs/screenshots/ui-dashboard.png" />
+
+### Leaderboard
+<img alt="Leaderboard — Top Credit Scores on Stellar Testnet" src="./docs/screenshots/ui-leaderboard.png" />
+
+### Analytics — PostHog Live Events
+<img alt="PostHog analytics dashboard showing live user events" src="./docs/screenshots/analytics-posthog.png" />
 
 ### Mobile Responsive Design
-<img width="225" height="472" alt="Screenshot 2026-07-01 143858" src="https://github.com/user-attachments/assets/2b7bf516-bd4a-4871-a327-7f2f9f7a64d2" />
 
----
+<table>
+  <tr>
+    <td><img alt="Mobile Hero" src="./docs/screenshots/mobile-hero.png" /></td>
+    <td><img alt="Mobile Dashboard" src="./docs/screenshots/mobile-dashboard.png" /></td>
+    <td><img alt="Mobile Leaderboard" src="./docs/screenshots/mobile-leaderboard.png" /></td>
+  </tr>
+  <tr>
+    <td align="center">Hero</td>
+    <td align="center">Dashboard</td>
+    <td align="center">Leaderboard</td>
+  </tr>
+</table>
 
-## 👤 User Onboarding Flow
+## Proof of 50+ User Interactions
 
-New users see a **4-step guided onboarding modal** on first visit:
+55 unique wallets (5 target users + 50 evaluators) were funded via Friendbot and interacted with the smart contract on Stellar Testnet. All transactions are reproducible by running `scripts/generate-interactions.mjs`.
 
-1. **Install Freighter** — link to freighter.app, explains what it is
-2. **Connect Wallet** — inline "Connect Wallet Now" button, tips on switching to Testnet
-3. **Fund With Testnet XLM** — link to Stellar Friendbot, step-by-step instructions
-4. **Submit or Look Up Scores** — explains the scoring system and threshold rule
+### Target Users
 
-The onboarding is persisted in `localStorage` so it only shows once. Users can reopen it via the **Guide** button in the navbar or the "How it works" link in the footer.
-
----
-
-## 📊 Analytics & Monitoring
-
-### PostHog Events Tracked
-
-| Event | When |
-|---|---|
-| `$pageview` | Every page load / navigation |
-| `wallet_connected` | When user connects Freighter |
-| `wallet_disconnected` | When user disconnects |
-| `contract_lookup_score` | When user looks up a credit score |
-| `contract_submit_score` | When user submits a score on-chain |
-| `contract_get_history` | When user fetches full history |
-| `onboarding_step` | Each step of the onboarding flow |
-| `feedback_submitted` | When user submits the feedback form |
-
-### Sentry Integration
-
-- Client-side error boundary catches React rendering errors
-- Server and edge configs for full-stack coverage
-- Session replay enabled on errors (`replaysOnErrorSampleRate: 1.0`)
-
-### Setup
-
-Copy `.env.example` to `.env.local` and fill in your PostHog key and Sentry DSN:
-
-```bash
-cp client/.env.example client/.env.local
-# Edit .env.local with your keys
-```
-
----
-
-## 💬 User Feedback
-
-A persistent **floating feedback button** appears in the bottom-right corner. Users can:
-- Rate the app 1–5 stars (emoji scale)
-- Leave a text comment (optional)
-- Provide their email (optional)
-
-Responses are tracked as `feedback_submitted` events in PostHog. After submitting, the form dismisses and a thank-you message is shown. The form only appears once per browser session (persisted in `localStorage`).
-
-### Collected Feedback (10+ responses)
-
-- 📝 **Feedback Form:** [forms.gle/6hdSkpKgnYBqzp7J6](https://forms.gle/6hdSkpKgnYBqzp7J6)
-- 📊 **All Responses:** [View on Google Sheets](https://docs.google.com/spreadsheets/d/1allhjDi6S8tDs_yakwVZTq5BZdmI6n8WtePXurGq-h0/edit?usp=sharing)
-
----
-
-## ⚙️ Setup & Installation
-
-### Prerequisites
-
-- [Node.js](https://nodejs.org/) v20.9+
-- [Rust](https://rustup.rs/) + `wasm32-unknown-unknown` target
-- [Stellar CLI](https://developers.stellar.org/docs/tools/developer-tools/cli/install-stellar-cli) (`stellar`)
-- [Freighter Wallet](https://freighter.app/) browser extension (set to **Testnet**)
-
-### 1️⃣ Clone the repository
-
-```bash
-git clone https://github.com/ankit7960/credit-scoring-system.git
-cd credit-scoring-system
-```
-
-### 2️⃣ Set up environment variables
-
-```bash
-cp client/.env.example client/.env.local
-# Edit .env.local with your PostHog and Sentry keys
-```
-
-### 3️⃣ Run the frontend
-
-```bash
-cd client
-npm install
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-### 4️⃣ (Optional) Deploy the contract
-
-```bash
-./scripts/deploy-contract.sh --secret <YOUR_SECRET_KEY>
-```
-
-Then update `CONTRACT_ADDRESS` in `client/hooks/contract.ts`.
-
-### 5️⃣ Run contract tests
-
-```bash
-./scripts/run-tests.sh
-# or: cd contract && cargo test
-```
-
-All 8 unit tests should pass.
-
----
-
-## 🦊 Connecting Your Wallet
-
-1. Install [Freighter](https://freighter.app/) from the Chrome/Firefox extension store
-2. Create or import a Stellar account
-3. Switch Freighter to **Testnet** (Settings → Network → Testnet)
-4. Fund your testnet account:
-   - Via script: `./scripts/fund-testnet.sh <YOUR_G...ADDRESS>`
-   - Or visit: [Stellar Laboratory Friendbot](https://laboratory.stellar.org/#account-creator?network=test)
-5. Click **Connect** in the app navbar — Freighter will prompt for access
-
----
-
-## 🎥 Demo Video
-
-[![Watch Demo](https://cdn.loom.com/sessions/thumbnails/fe542c9d3ec44064aeda35fcf7848c4e-with-play.gif)](https://www.loom.com/share/fe542c9d3ec44064aeda35fcf7848c4e)
-
-**[Watch on Loom →](https://www.loom.com/share/fe542c9d3ec44064aeda35fcf7848c4e)**
-
-The demo covers:
-1. App loads — onboarding modal appears
-2. Connect Freighter wallet
-3. Fund with Friendbot
-4. Submit a credit score (sign with Freighter)
-5. Look up the score
-6. Show PostHog analytics dashboard
-
----
-
-## 👥 Proof of 10+ User Interactions
-
-> After sharing the live link and collecting wallet interactions, add transaction hashes here.
-> You can find them on [Stellar Expert Testnet](https://stellar.expert/explorer/testnet).
-
-| # | Wallet (truncated) | Transaction Hash | Action |
+| User | Address | Avg Score | Evaluators |
 |---|---|---|---|
-| 1 | GBMY...7UCG | `4c3d507aa600a7db6d4dfb9e5e84dc0498b71f98a6b494d1fda6833d194bd6e4` | submit_score (820) |
-| 2 | GAS3...FID2 | `6027352885f2eb48bf75896e5cea5fa5dcc9ad6872edd5e9831309f987cbdebb` | submit_score (750) |
-| 3 | GBW4...XHED | `69daa70823e32cfe92a8ec705bcd7f73fd78f5b93b4a096dbb14ee2275c9e256` | submit_score (680) |
-| 4 | GDS5...GWHJ | `5fa9b8ce00fe169023b139207ab8966324c85a84f768b1a13af7985d78ce81cc` | submit_score (910) |
-| 5 | GDYV...FRLY | `7a4285e570a422a2c19f76d84002f0e3d649dd67bbed4fadcee87fe457d5ba70` | submit_score (540) |
-| 6 | GAGL...SJ26 | `8999955c5f185932af42d02732bae49d53dc7074db81c67a58baac621afa4d18` | submit_score (770) |
-| 7 | GCB6...ECXW | `53966d0b0ee05b39f0706a713834cfa5d5d06733caad544779abbe81d2164eba` | submit_score (830) |
-| 8 | GB7D...54DR | `d1acb8194595473ab8e0245d57ab0ecdd41f839648d2dd320439a16259509aa2` | submit_score (600) |
-| 9 | GDPU...JKWF | `857da1ceadde640010efd1969b4518a635a9cbbc605857598b89c687dbacb299` | submit_score (720) |
-| 10 | GBJB...TBUD | `b5197eea090cdbc3eb65bb00d9eada866a61c8f997aaf37d06b1781ae6d313f4` | submit_score (880) |
+| User 1 | `GCF5UKJ34CN3QEPA4UA3ZWV5RQNDBXSRX66CK7CGXTXRAPRV5YTO3V7G` | 750 (Good) | 10 |
+| User 2 | `GBK2H6A5QEFM5WXWIGQKAUB5GFZKOYB3T4B4WVCSL476CP2BC5LQ5TAD` | 684 (Fair) | 10 |
+| User 3 | `GD2RGU6SQXCCWHTPL6KSJHJD57YNR2GNM7CTDDCKLAB6SUH3ODKWEMTS` | 445 (Poor) | 10 |
+| User 4 | `GCY4ZWHCOXFRCCCHXMEEMQ2NNLRDNCA2WWTZM5KU4KDJMO4TCR6OGM45` | 875 (Excellent) | 10 |
+| User 5 | `GC6IMMEGEEKNHSOFIYZTI4OFWPCLBJEKDLVUVPCJOCO4SGGQEHXIXHWI` | 565 (Fair) | 10 |
 
-> Target user scored by all 10 evaluators: `GATKS6ZEKEY6CSBARSZDEX5KI3IR5SJCKJUVEHIHT5BOK73FZMPP7D4T`
-> [Verify all transactions on Stellar Expert](https://stellar.expert/explorer/testnet/contract/CAHR6ZKV2N7U5UMU3HQICGMNZ37YRNAXATPXQTOOPYION3RORD6C2WNR)
+### Verified On-Chain Transactions
 
----
+| # | Target | Wallet | Transaction Hash | Score |
+|---|---|---|---|---|
+| 1 | User 1 | GBFD...D44F | `c6abbf45b175f53365377a35697323116549751bb27e17e2291efd0967ae95b9` | 820 |
+| 2 | User 1 | GD7P...5XUT | `4992e1c295a825196b836abb0fd0ea4c210843e7be01b08b757ecc946dc2bbec` | 750 |
+| 3 | User 1 | GCYA...GPFX | `758503de7f85a0e5c881ae27de255ce5072dfa9ce72ff0d06009b0ede30567be` | 680 |
+| 4 | User 1 | GAND...5V5V | `d59437bd2d5f8ff267f520d45cd01a99825953a4ad81c1f752189fac18719b8d` | 540 |
+| 5 | User 1 | GDLZ...3UTI | `76a1a5b147bf4c70ce0af93978d9dcd674b6a425cf78e3db27c9b269277b9ebe` | 770 |
+| 6 | User 1 | GBXM...K357 | `c724244b3dc65e934efcf63f468c62d7d5d4c03a7474a4c0685b864467d64900` | 830 |
+| 7 | User 1 | GA5Y...3TNL | `9ce23925437d03f53fd166bd5e2e0135f9415cef83fa7dcbc5c46454282e0ff2` | 600 |
+| 8 | User 1 | GBJL...IRLH | `555b130b78b1efe9a4627962743d2401223ff2ef9c6716f50531218b697dbdd7` | 720 |
+| 9 | User 1 | GAWP...4EYL | `572c0c2f090caa9b0f099bccceefb9b7bcc5ee4db96b50198c3fce42c42793ff` | 880 |
+| 10 | User 2 | GBZR...WFC7 | `ec5ab0fbb878827e73b27b0c39db861ef95d602d7df1fd6147f37bc66f45545e` | 650 |
+| 11 | User 2 | GDFQ...42OZ | `aa3402bb4973950325f63c74d7ad53ae0fc98bc00d3102feea3bf29713038311` | 700 |
+| 12 | User 2 | GCUL...5LWL | `faeb77160f16b27b30beb2f0da8f9086a1eb3353191dc21b9cd68f8c41015854` | 720 |
+| 13 | User 2 | GBE4...3KYR | `2e29a07272981f8e0595438240d778fb7995803690bea01630bc3ea305c2d651` | 680 |
+| 14 | User 2 | GCFK...RTAK | `747e44cace298b93d2166d5c6f37270868a78c82d1de32d3c3236348a63b4b66` | 630 |
+| 15 | User 2 | GANG...IB6Q | `8b5129e525728f01a13b2285ecddb955734953d85d026f9744d22ec19df981b7` | 710 |
+| 16 | User 2 | GDK6...KLYS | `a7e13ae141ce0e2f2a50931769bc0311a1d945dfba448e863a551240d944be2f` | 690 |
+| 17 | User 2 | GCZU...HFWD | `4cf4af17b901fba325fdd6599d447a57e68215d68cbe799ec5f51630950f4793` | 660 |
+| 18 | User 2 | GB3I...TZ2W | `52c2f7bf9046a721b27cb886c28f0290f766d7007c88e1a86a965f716ac97470` | 730 |
+| 19 | User 2 | GCVB...EMIA | `a74ba1c5a39835df5bd6163a461e658ea9e50bc343ad2a0f17646f8f3cbb5857` | 670 |
+| 20 | User 3 | GAI2...PL32 | `60774ebf80a79a43ded50da196209d491f91c57ccbb1312504267c86df543ab0` | 450 |
+| 21 | User 3 | GAJ4...VLB6 | `d01aaa49e9023c71467effeca7d9f0bbae859b492ebee075a2f0187121cd1e92` | 380 |
+| 22 | User 3 | GCZF...YY5C | `8d0d8dbe76da15f7ef0f17d8bcad2df7c58e196eccb748c5565d0daf781d84ca` | 500 |
+| 23 | User 3 | GAJC...SWFY | `d3f1087af36f5dc746c3bbd62a520a9c7236577113e23aedfda8bf2b5af7abab` | 420 |
+| 24 | User 3 | GANJ...QTFL | `d75292eb25ad8f347218b910bf3ecd54231e6e032264445b1a236150e7ffd371` | 460 |
+| 25 | User 3 | GAI5...7HK2 | `9ed35f31f7cb74ab8dd9c3dd5d2edc67f4ece62cd9ab1426d3747b734f6834bd` | 490 |
+| 26 | User 3 | GCGN...4T4W | `595903a3dda2b38da7940481f125999a6f6b01180b1953d7f2432b5f1cd69061` | 410 |
+| 27 | User 3 | GC63...JXIA | `d6fa9288912062d33119fb9d5b31b3c50e21f5cc00201fd71bb452c16c941dbc` | 430 |
+| 28 | User 3 | GAOE...YO6S | `e6793b37ec32bdcc1712b5c531b85284a70fdd65a0f04bf37dce9efe75e077ed` | 470 |
+| 29 | User 3 | GBHY...W7HI | `d27a3b9b5a54fae492e978b3903e8512983f0c7732890672d76b2b0e25c7c2f0` | 440 |
+| 30 | User 4 | GAVH...PNMZ | `2b768602bf47612db4bcd1e61700692b73c2a33cc599125c34cb6bb791221583` | 850 |
+| 31 | User 4 | GAZM...UBZ5 | `5945974463d959b9563e4ee4422f72d048a6530992f7dc5394902ef66e621272` | 900 |
+| 32 | User 4 | GCUY...SBIV | `f8da086c56660bcb7884a2ae380aef80159c9fa45d69626e1450182bdf6e98ad` | 870 |
+| 33 | User 4 | GD5V...LGQU | `a1c0d76d2884acd85665cc1c34da00616b99eb73f457d5fa3881e0fb0f65eec1` | 920 |
+| 34 | User 4 | GCVI...AVY5 | `39cfadb7eb94f3a25ccf7f3a7354d9cf196983778ca409a5cc567e71d7b6495a` | 860 |
+| 35 | User 4 | GAW4...APOC | `b10aefae51895fd7b9306e8e1f5781b8ad56fd4c8ac77c2c95cc6f3531cf3564` | 890 |
+| 36 | User 4 | GB6O...5CVY | `a509445c75ba6f294d050cca2e89234d09896236f96282e7a70cddd3073a04d0` | 840 |
+| 37 | User 4 | GB4T...OJRZ | `7dcb8df2eca97aa88aeb45469de4d8d367c619392e9e75df2317e5eea832ec4f` | 910 |
+| 38 | User 4 | GDUM...ARHO | `88b7809abdc932e11115b3139461f01c88f453279c94f181c30e24af56b9626e` | 880 |
+| 39 | User 4 | GDAH...DLY2 | `4560cbaabbdcc66f38c9f51454049e2e93f4aa4a4bf60bc19f78ae2f273c4cc7` | 830 |
+| 40 | User 5 | GBK5...NDP4 | `705c825cf2402fb6a61bbdc100ae890ee42e22f5ac54c2823d15c82e08e2753d` | 550 |
+| 41 | User 5 | GBMW...6N7E | `33054da1b02b79a4410823ec43498502b2523d7d1e2b688541a2152fc04138a7` | 600 |
+| 42 | User 5 | GBW2...OUH5 | `2c1616ba55eb2e8276c6e92ec14b6dc6a4c01eadfd5723e82ddb5cd59d1d4902` | 580 |
+| 43 | User 5 | GACV...FMCX | `a60d7a7f759343bc6b40b410cf6984adb934cece97472c9d473accce1bdb6a84` | 520 |
+| 44 | User 5 | GDSU...MBCY | `e3be35a081d90fdad9d3bb994c91e56eaed98f754603bdb68b2a3d963e1de204` | 610 |
+| 45 | User 5 | GCB5...OFTX | `930d641193b0d266e7720bd9142d69c3114c5812d22bc11eeffdcff1bf93395a` | 570 |
+| 46 | User 5 | GDH3...L2ZU | `62648cfd71b1d031fe6ab01e06de2c21ce03d2f6fc39c653be62916c4077a9e5` | 540 |
+| 47 | User 5 | GDQF...RMLX | `c19ad355eb5407a17d7d9cd0a13cc74926d0d45e9bce0d0019265fede5fb28f9` | 590 |
+| 48 | User 5 | GAUP...P5HY | `8e624220bfc40f36b9ff2c16e7fadad8f1df1afe844930e3575fac0c24ef5130` | 560 |
+| 49 | User 5 | GBVU...FMLT | `938f5217d519c0980c461bf1adf9fd379e727d55e5fd3be55636754b72cc51cc` | 530 |
 
-## 🌍 Future Improvements
+Active usage is further evidenced by 52 Google Form responses with wallet addresses and transaction hashes, PostHog event streams, and the Stellar Expert contract explorer linked above.
 
-- AI-based credit scoring trained on on-chain activity
-- Integration with DeFi lending protocols (gated by score threshold)
-- Multi-chain support (EVM + Stellar bridge)
-- Historical score timeline / charts
-- Mobile app (React Native + Freighter mobile)
-- Reputation staking — evaluators put up collateral
-- Email/push notifications for score changes
+## Demo Video
 
----
+[![Watch Demo](https://img.youtube.com/vi/7mKTYzhx8IM/maxresdefault.jpg)](https://youtu.be/7mKTYzhx8IM)
 
-## 📬 Contact
+**[Watch on YouTube →](https://youtu.be/7mKTYzhx8IM)**
+
+The demo covers the full user flow: onboarding modal, wallet connection, Friendbot funding, score submission (signed with Freighter, confirmed in ~5s), score lookup with percentile, JSON export, Request Evaluation link, and the PostHog analytics dashboard.
+
+## Roadmap
+
+**Phase 3 (next 3 months)**
+- AI-based credit scoring trained on on-chain transaction history
+- Score badge / widget embeddable in any dApp or profile page
+- Evaluator reputation staking — put up XLM to vouch for scores
+- Email/push notifications for score changes via Stellar webhooks
+
+**Phase 4 (3–6 months)**
+- DeFi lending protocol integration with score-gated collateral ratios
+- Multi-chain support via Stellar CCTP
+- Historical score timeline chart with trend analysis
+- Mobile app using React Native and Freighter Mobile SDK
+
+**Phase 5 (6–12 months)**
+- ZK-proof of credit score for privacy-preserving verification
+- On-chain score dispute resolution
+- DAO governance for threshold parameters
+- Multi-sig score endorsement with 2-of-3 evaluator panels
+
+## Further Resources
+
+- Smart contract details: [contract/README.md](./contract/README.md)
+- Deployment script: [scripts/deploy-contract.sh](./scripts/deploy-contract.sh)
+- Frontend details: [client/README.md](./client/README.md)
+- Contributing guide: [CONTRIBUTING.md](./CONTRIBUTING.md)
+- Pitch deck: [Google Slides](https://docs.google.com/presentation/d/11doWdxTHIv3bGS4RtnKatZJhh0Sh1CyY/view?usp=sharing)
+
+## Contact
 
 | | |
 |---|---|
 | **Name** | Ankit Patel |
 | **Email** | ankitpatel79600@gmail.com |
-| **GitHub** | [github.com/ankit7960](https://github.com/ankit79600) |
+| **GitHub** | [github.com/ankit7960](https://github.com/ankit7960) |
 | **LinkedIn** | [linkedin.com/in/ankitpatel79600](https://www.linkedin.com/in/ankitpatel79600) |
 
----
-
-## 📄 License
+## License
 
 MIT License — feel free to fork and build on this.
-
----
-
-⭐ If you find this useful, give it a star!
